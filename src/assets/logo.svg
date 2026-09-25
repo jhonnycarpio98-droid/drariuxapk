@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <!--
+    Marca Civitas (vector => fondo transparente nativo).
+    Escudo heraldico con torre almenada y corona; oro antique sobre incisa oscura.
+    Servible como brand in-app y como fuente del icono de launcher (Capacitor).
+  -->
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f0d18a" />
+      <stop offset="0.5" stop-color="#d9b463" />
+      <stop offset="1" stop-color="#9c7c37" />
+    </linearGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#241d14" />
+      <stop offset="1" stop-color="#140f0a" />
+    </linearGradient>
+  </defs>
+
+  <!-- corona -->
+  <path
+    d="M40 26l6 8 18-12 18 12 6-8v10H40V26Z"
+    fill="url(#gold)"
+    stroke="#140f0a"
+    stroke-width="1.5"
+  />
+  <circle cx="40" cy="24" r="3" fill="url(#gold)" />
+  <circle cx="64" cy="18" r="3" fill="url(#gold)" />
+  <circle cx="88" cy="24" r="3" fill="url(#gold)" />
+
+  <!-- escudo -->
+  <path
+    d="M64 36 106 50v30c0 26-18 41-42 51-24-10-42-25-42-51V50L64 36Z"
+    fill="url(#field)"
+    stroke="url(#gold)"
+    stroke-width="4"
+  />
+
+  <!-- torre almenada -->
+  <path
+    d="M46 96V62l8-5v-8h6v5l4-3 4 3v8l8 5v34h-9v-9H55v9H46Z"
+    fill="url(#gold)"
+  />
+  <!-- puerta -->
+  <path d="M60 96V82a4 4 0 0 1 8 0v14h-8Z" fill="#140f0a" />
+  <!-- aspilleras -->
+  <rect x="52" y="70" width="3" height="8" rx="1" fill="#140f0a" />
+  <rect x="73" y="70" width="3" height="8" rx="1" fill="#140f0a" />
+</svg>

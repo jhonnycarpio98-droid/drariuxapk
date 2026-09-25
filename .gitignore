@@ -1,0 +1,6 @@
+node_modules/
+dist/
+*.tsbuildinfo
+# android native (regenerable con `npm run cap:add:android`)
+android/
+.DS_Store
