@@ -37,8 +37,15 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      # El runner ubuntu-latest ya trae el Android SDK en $ANDROID_HOME; no hace
+      # falta setup-android (su action intenta instalar 'tools', ya retirado).
+      # Aceptamos licencias y bajamos lo que Capacitor pide (API 34).
+      - name: Prepare Android SDK (preinstalado en el runner)
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKM" --licenses >/dev/null 2>&1 || true
+          "$SDKM" "platforms;android-34" "build-tools;34.0.0" "platform-tools"
 
       # android/ está gitignorado: se regenera desde Capacitor en el runner.
       - name: Add + sync Capacitor Android platform
