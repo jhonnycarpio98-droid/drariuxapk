@@ -1,5 +1,6 @@
 node_modules/
 dist/
+apk_out/
 *.tsbuildinfo
 # android native (regenerable con `npm run cap:add:android`)
 android/
