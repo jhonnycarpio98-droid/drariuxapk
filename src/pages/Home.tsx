@@ -5,7 +5,7 @@ import { api } from "@/api/client";
 import {
   DynastyIcon,
   MapIcon,
-  NewsIcon,
+  NexusIcon,
   KingdomIcon,
   WalletIcon,
 } from "@/components/icons";
@@ -39,15 +39,15 @@ export default function Home() {
           <span className="title">World Map</span>
           <span className="muted">Reservado (fase final)</span>
         </Link>
-        <Link to="/news" className="section-card">
-          <NewsIcon className="icon" />
-          <span className="title">News</span>
-          <span className="muted">Mensajería entre casas</span>
+        <Link to="/nexus" className="section-card">
+          <NexusIcon className="icon" />
+          <span className="title">Nexus</span>
+          <span className="muted">Mensajería y amistades</span>
         </Link>
         <Link to="/kingdom" className="section-card">
           <KingdomIcon className="icon" />
           <span className="title">Kingdom Room</span>
-          <span className="muted">Mercado · Regencia · Almacén · Ejército</span>
+          <span className="muted">Comercio · Regencia · Ejército</span>
         </Link>
         <Link to="/wallet" className="section-card wide">
           <WalletIcon className="icon" />

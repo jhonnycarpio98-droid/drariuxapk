@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, type WalletState } from "@/api/client";
 import { QueryBoundary, money } from "@/components/ui";
+import { ensureWallet } from "@/lib/wallet";
 
 export default function Wallet() {
   const qc = useQueryClient();
@@ -15,9 +16,28 @@ export default function Wallet() {
     },
   });
 
+  // Recuperación: si el motor aún no tiene dirección (p. ej. porque el primer
+  // ensureWallet del arranque coincidió con una partida aún materializándose),
+  // reintentamos generarla/vincularla aquí en vez de dejar "generando…" a secas.
+  const ensure = useMutation({
+    mutationFn: () => ensureWallet(),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["wallet"] }),
+  });
+
   return (
     <QueryBoundary q={q}>
-      {(d) => <WalletView d={d} onAction={(b) => runAction.mutate(b)} busy={runAction.isPending} msg={lastMsg(runAction)} ok={runAction.data?.ok} />}
+      {(d) => (
+        <WalletView
+          d={d}
+          onAction={(b) => runAction.mutate(b)}
+          busy={runAction.isPending}
+          msg={lastMsg(runAction)}
+          ok={runAction.data?.ok}
+          onEnsure={() => ensure.mutate()}
+          ensuring={ensure.isPending}
+          ensureFailed={ensure.isError}
+        />
+      )}
     </QueryBoundary>
   );
 }
@@ -33,15 +53,31 @@ function WalletView({
   busy,
   msg,
   ok,
+  onEnsure,
+  ensuring,
+  ensureFailed,
 }: {
   d: WalletState;
   onAction: (body: Record<string, unknown>) => void;
   busy: boolean;
   msg?: string;
   ok?: boolean;
+  onEnsure: () => void;
+  ensuring: boolean;
+  ensureFailed: boolean;
 }) {
   const [addr, setAddr] = useState("");
   const [amount, setAmount] = useState("");
+
+  // Un único intento automático por montaje si el motor no tiene dirección;
+  // si falla, el usuario puede reintentar con el botón.
+  const autoTried = useRef(false);
+  useEffect(() => {
+    if (!d.address && !autoTried.current) {
+      autoTried.current = true;
+      onEnsure();
+    }
+  }, [d.address, onEnsure]);
 
   const amt = Number(amount);
   return (
@@ -69,11 +105,32 @@ function WalletView({
         </div>
         <div className="row">
           <span className="muted">Dirección</span>
-          <span className="mono">{d.address ? shorten(d.address) : "sin registrar"}</span>
+          {d.address ? (
+            <span className="mono">{shorten(d.address)}</span>
+          ) : (
+            <span className="row">
+              <span className="mono">{ensuring ? "generando…" : "sin vincular"}</span>
+              <button
+                className="btn ghost"
+                disabled={ensuring}
+                onClick={onEnsure}
+                title={ensureFailed ? "No se pudo generar/vincular. Reintentar." : undefined}
+              >
+                {ensuring ? "Generando…" : "Generar ahora"}
+              </button>
+            </span>
+          )}
         </div>
+        {!d.address && ensureFailed && !ensuring && (
+          <p className="error" style={{ marginTop: 4 }}>
+            No se pudo vincular la dirección con el motor. Pulsa «Generar ahora» para
+            reintentarlo.
+          </p>
+        )}
         <p className="muted" style={{ marginTop: 8 }}>
-          La clave privada vive solo cifrada en este dispositivo; el motor jamás
-          la ve. {d.symbol} es la moneda nativa de la red drariux.
+          Tu dirección se creó en este dispositivo con viem al iniciar la partida.
+          La clave privada vive solo cifrada aquí; el motor jamás la ve.{" "}
+          {d.symbol} es la moneda nativa de la red drariux.
         </p>
       </div>
 
@@ -107,7 +164,7 @@ function WalletView({
         </div>
 
         <div className="field" style={{ marginTop: 12 }}>
-          <label htmlFor="addr">Registrar dirección pública (0x…)</label>
+          <label htmlFor="addr">Cambiar dirección vinculada (avanzado)</label>
           <div className="inlineField">
             <input
               id="addr"

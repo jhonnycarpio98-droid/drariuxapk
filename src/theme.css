@@ -357,3 +357,94 @@ select {
 .inlineField input {
   flex: 1;
 }
+
+/* --- Pantalla de acceso (login / registro) ------------------------------ */
+.topbar .btn {
+  margin-left: auto;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.login-wrap {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 360px;
+  padding: 22px 20px;
+}
+
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.login-brand img {
+  width: 60px;
+  height: 60px;
+}
+
+.login-brand h1 {
+  margin: 0;
+  color: var(--gold);
+  font-size: 24px;
+  letter-spacing: 0.06em;
+}
+
+.login-card .field span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* --- Nexus (mensajería) ------------------------------------------------- */
+.muted.small {
+  font-size: 11px;
+}
+
+.linklike {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  flex: 1;
+}
+
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 52vh;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.bubble {
+  align-self: flex-start;
+  max-width: 80%;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.bubble.mine {
+  align-self: flex-end;
+  background: rgba(217, 180, 99, 0.12);
+  border-color: var(--gold-dim);
+}
+
+.bubble .small {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+}

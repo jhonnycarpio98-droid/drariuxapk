@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { api, type FamilyMember } from "@/api/client";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { api, type FamilyMember, type DynastyState } from "@/api/client";
 import { QueryBoundary, money } from "@/components/ui";
 
-const SUBS = ["Líder", "Árbol", "Tesorería", "Producción"] as const;
+const SUBS = ["Líder", "Árbol", "Gestionar", "Tesorería", "Producción"] as const;
 
 export default function Dynasty() {
   const [sub, setSub] = useState<(typeof SUBS)[number]>("Líder");
@@ -49,39 +49,8 @@ export default function Dynasty() {
               </div>
             );
 
-          if (sub === "Árbol")
-            return (
-              <div className="card">
-                <h2>Árbol genealógico</h2>
-                {d.tree ? (
-                  <>
-                    {d.tree.head && (
-                      <div className="row">
-                        <div>
-                          <strong>{d.tree.head.name}</strong>{" "}
-                          <span className="pill">Señor/a</span>
-                        </div>
-                        <span className="muted">{d.tree.head.age} años</span>
-                      </div>
-                    )}
-                    {d.tree.members.map((m) => (
-                      <div className="row" key={String(m.member_id)}>
-                        <div>
-                          {m.name}{" "}
-                          <span className="pill">{m.role ?? "miembro"}</span>
-                        </div>
-                        <span className="muted">{m.age} años</span>
-                      </div>
-                    ))}
-                    <p className="muted">
-                      Total de miembros vivos: {d.tree.member_count}
-                    </p>
-                  </>
-                ) : (
-                  <p className="muted">Sin casa bautizada todavía.</p>
-                )}
-              </div>
-            );
+          if (sub === "Árbol") return <TreePanel d={d} />;
+          if (sub === "Gestionar") return <ManagePanel d={d} onDone={() => q.refetch()} />;
 
           if (sub === "Tesorería")
             return (
@@ -133,6 +102,153 @@ export default function Dynasty() {
           );
         }}
       </QueryBoundary>
+    </div>
+  );
+}
+
+function TreePanel({ d }: { d: DynastyState }) {
+  return (
+    <div className="card">
+      <h2>Árbol genealógico</h2>
+      {d.tree ? (
+        <>
+          {d.tree.head && (
+            <div className="row">
+              <div>
+                <strong>{d.tree.head.name}</strong> <span className="pill">Señor/a</span>
+              </div>
+              <span className="muted">{d.tree.head.age} años</span>
+            </div>
+          )}
+          {d.tree.members.map((m) => (
+            <div className="row" key={String(m.member_id)}>
+              <div>
+                {m.name} <span className="pill">{m.role ?? "miembro"}</span>
+              </div>
+              <span className="muted">{m.age} años</span>
+            </div>
+          ))}
+          <p className="muted">Total de miembros vivos: {d.tree.member_count}</p>
+        </>
+      ) : (
+        <p className="muted">Sin casa bautizada todavía.</p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Gestión de la casa: matrimonios y heredero. Espejo API de los comandos
+ * `casarse`, `casar <miembro> = <npc>` y `heredero`. Solo el cabeza puede
+ * operar (el motor responde 403 en caso contrario); los límites de edad,
+ * membresía y tamaño los valida el motor, y aquí mostramos su mensaje.
+ */
+function ManagePanel({ d, onDone }: { d: DynastyState; onDone: () => void }) {
+  const [feedback, setFeedback] = useState<{ ok: boolean; msg: string } | null>(null);
+  const act = useMutation({
+    mutationFn: (body: Record<string, unknown>) => api.dynastyAction(body),
+    onSuccess: (res) => {
+      setFeedback({ ok: !!res.ok, msg: res.msg ?? String(res.error ?? "Listo.") });
+      onDone();
+    },
+    onError: (e: unknown) => {
+      // El motor responde los rechazos de negocio (ya casado, sin autoridad,
+      // edad insuficiente...) como 4xx con {ok:false,msg}. client.ts lanza
+      // ApiError con `.payload`; sacamos de ahí el mensaje amigable en vez del
+      // genérico "HTTP 400".
+      const payload = (e as { payload?: { msg?: string; error?: string } })?.payload;
+      const msg =
+        payload?.msg ??
+        payload?.error ??
+        (e instanceof Error && e.message ? e.message : "No se pudo completar.");
+      setFeedback({ ok: false, msg });
+    },
+  });
+  const busy = act.isPending;
+  const tree = d.tree;
+  const members = tree?.members ?? [];
+  const isHead = d.leader.is_player;
+
+  const askName = (label: string) => window.prompt(label)?.trim() || null;
+
+  return (
+    <div>
+      {!tree && (
+        <div className="card">
+          <p className="muted">Aún no tienes casa bautizada. Fóndala desde el juego.</p>
+        </div>
+      )}
+
+      {tree && !isHead && (
+        <div className="card">
+          <p className="muted">
+            Solo el señor/a de la casa puede gestionarla. Tu personaje no es el cabeza
+            ({tree.head?.name ?? "—"}).
+          </p>
+        </div>
+      )}
+
+      {tree && isHead && (
+        <>
+          <div className="card">
+            <h2>Matrimonio del cabeza</h2>
+            <p className="muted">
+              {tree.head?.name ?? "Señor/a"} · {tree.head?.age ?? "—"} años. El cónyuge entra
+              en la casa y la pareja podrá tener descendencia con el tiempo.
+            </p>
+            <div className="actions">
+              <button
+                className="btn"
+                disabled={busy}
+                onClick={() => {
+                  const name = askName("Nombre del NPC con quien casar al cabeza:");
+                  if (name) act.mutate({ action: "marry_head", name });
+                }}
+              >
+                Casar cabeza
+              </button>
+            </div>
+          </div>
+
+          <div className="card">
+            <h2>Miembros</h2>
+            {members.length === 0 && <p className="muted">No hay otros miembros todavía.</p>}
+            {members.map((m) => (
+              <div className="row" key={String(m.member_id)}>
+                <div>
+                  {m.name} <span className="pill">{m.role ?? "miembro"}</span>
+                  <div className="muted" style={{ fontSize: 12 }}>
+                    {m.age} años{m.spouse_id != null ? " · casado/a" : ""}
+                  </div>
+                </div>
+                <div className="actions" style={{ gap: 6 }}>
+                  <button
+                    className="btn ghost"
+                    disabled={busy || m.spouse_id != null}
+                    onClick={() => {
+                      const name = askName(`Nombre del NPC para casar a ${m.name}:`);
+                      if (name) act.mutate({ action: "marry_member", member: m.name, name });
+                    }}
+                  >
+                    Casar
+                  </button>
+                  <button
+                    className="btn ghost"
+                    disabled={busy || m.role === "heredero"}
+                    onClick={() => act.mutate({ action: "heir", name: m.name })}
+                  >
+                    Heredero
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {feedback && (
+            <p className={feedback.ok ? "ok" : "error"}>{feedback.msg}</p>
+          )}
+        </>
+      )}
     </div>
   );
 }

@@ -31,6 +31,11 @@ const UNPLAYABLE = new Set([OCEAN, ICE]);
 // Circunradio base de un hexágono (flat-top) en píxeles del mundo (escala 1).
 const R = 18;
 const SQRT3 = Math.sqrt(3);
+// Límites de zoom: el suelo (MIN) evita que el jugador se pierda alejando
+// hasta el mundo entero; el techo (MAX) evita pixeleo excesivo.
+const MIN_SCALE = 0.35;
+const MAX_SCALE = 4;
+const DEFAULT_SCALE = 0.9; // apertura centrada en el jugador
 // Vecinos en odd-q (columna impar desplazada a mitad de fila): mismos deltas
 // que ``world_map._ODDQ_DIRS`` del motor.
 const NEIGHBORS_EVEN = [[1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [0, 1]];
@@ -144,7 +149,7 @@ function MapBoard({
   onExplore: (qr: [number, number]) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [view, setView] = useState({ scale: 0.16, tx: 0, ty: 0 });
+  const [view, setView] = useState({ scale: DEFAULT_SCALE, tx: 0, ty: 0 });
   const [ready, setReady] = useState(false);
   const drag = useRef<{ x: number; y: number; tx: number; ty: number; moved: number } | null>(null);
 
@@ -159,6 +164,32 @@ function MapBoard({
 
   const W = d.width;
   const H = d.height;
+
+  // Tamaño del mundo en píxeles (escala 1), de centro a centro + un radio.
+  const worldSize = useMemo(
+    () => ({
+      wW: 1.5 * R * (W - 1) + 2 * R,
+      wH: SQRT3 * R * (H - 1 + 0.5) + 2 * R,
+    }),
+    [W, H],
+  );
+
+  // Recorta escala y paneo: el mundo nunca puede salirse del todo de la vista
+  // (suelo de zoom + bordes), así el jugador no se "pierde" alejando.
+  const clampView = useCallback(
+    (v: { scale: number; tx: number; ty: number }) => {
+      const canvas = canvasRef.current;
+      const cssW = canvas?.clientWidth || 360;
+      const cssH = canvas?.clientHeight || 480;
+      const scale = clamp(v.scale, MIN_SCALE, MAX_SCALE);
+      const cw = worldSize.wW * scale;
+      const ch = worldSize.wH * scale;
+      const tx = cw <= cssW ? (cssW - cw) / 2 : clamp(v.tx, cssW - cw, 0);
+      const ty = ch <= cssH ? (cssH - ch) / 2 : clamp(v.ty, cssH - ch, 0);
+      return { scale, tx, ty };
+    },
+    [worldSize],
+  );
 
   const cellAt = useCallback(
     (q: number, r: number): Cell | null => {
@@ -178,38 +209,61 @@ function MapBoard({
     [W, H, d.rows, zoneByRow, oasisSet, regionByKey],
   );
 
-  // Ajustar el viewport para ver todo el mundo.
+  // Ver todo el mundo respetando el suelo de zoom, centrado.
   const fitWorld = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const cssW = canvas.clientWidth || 360;
     const cssH = canvas.clientHeight || 480;
-    const wW = 1.5 * R * (W - 1) + 2 * R;
-    const wH = SQRT3 * R * (H - 1 + 0.5) + 2 * R;
-    const scale = Math.min(cssW / wW, cssH / wH) * 0.98;
-    setView({
-      scale,
-      tx: (cssW - wW * scale) / 2 - 0,
-      ty: (cssH - wH * scale) / 2,
-    });
-  }, [W, H]);
+    const scale = clamp(
+      Math.min(cssW / worldSize.wW, cssH / worldSize.wH) * 0.98,
+      MIN_SCALE,
+      MAX_SCALE,
+    );
+    setView(
+      clampView({
+        scale,
+        tx: (cssW - worldSize.wW * scale) / 2,
+        ty: (cssH - worldSize.wH * scale) / 2,
+      }),
+    );
+  }, [worldSize, clampView]);
 
-  const centerOn = useCallback((q: number, r: number, scale?: number) => {
+  const centerOn = useCallback(
+    (q: number, r: number, scale?: number) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const cssW = canvas.clientWidth || 360;
+      const cssH = canvas.clientHeight || 480;
+      const [wx, wy] = hexToPixel(q, r);
+      const s = clamp(scale ?? view.scale, MIN_SCALE, MAX_SCALE);
+      setView(clampView({ scale: s, tx: cssW / 2 - wx * s, ty: cssH / 2 - wy * s }));
+    },
+    [view.scale, clampView],
+  );
+
+  function doZoom(factor: number) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const cssW = canvas.clientWidth || 360;
     const cssH = canvas.clientHeight || 480;
-    const [wx, wy] = hexToPixel(q, r);
-    const s = scale ?? Math.max(view.scale, 0.5);
-    setView({ scale: s, tx: cssW / 2 - wx * s, ty: cssH / 2 - wy * s });
-  }, [view.scale]);
+    setView((v) => {
+      const ns = clamp(v.scale * factor, MIN_SCALE, MAX_SCALE);
+      const k = ns / v.scale;
+      const mx = cssW / 2;
+      const my = cssH / 2;
+      return clampView({ scale: ns, tx: mx - (mx - v.tx) * k, ty: my - (my - v.ty) * k });
+    });
+  }
 
   useEffect(() => {
     if (!ready) {
       setReady(true);
-      fitWorld();
+      // Abrir centrado en el jugador (no en el mundo entero).
+      if (d.player) centerOn(d.player[0], d.player[1], DEFAULT_SCALE);
+      else fitWorld();
     }
-  }, [ready, fitWorld]);
+  }, [ready, d.player, centerOn, fitWorld]);
 
   // Repintado.
   useEffect(() => {
@@ -328,7 +382,7 @@ function MapBoard({
     const dx = e.clientX - d0.x;
     const dy = e.clientY - d0.y;
     d0.moved = Math.max(d0.moved, Math.abs(dx) + Math.abs(dy));
-    setView((v) => ({ ...v, tx: d0.tx + dx, ty: d0.ty + dy }));
+    setView((v) => clampView({ scale: v.scale, tx: d0.tx + dx, ty: d0.ty + dy }));
   }
   function onPointerUp(e: React.PointerEvent<HTMLCanvasElement>) {
     const d0 = drag.current;
@@ -346,9 +400,9 @@ function MapBoard({
     const my = e.clientY - rect.top;
     const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
     setView((v) => {
-      const ns = clamp(v.scale * factor, 0.06, 4);
+      const ns = clamp(v.scale * factor, MIN_SCALE, MAX_SCALE);
       const k = ns / v.scale;
-      return { scale: ns, tx: mx - (mx - v.tx) * k, ty: my - (my - v.ty) * k };
+      return clampView({ scale: ns, tx: mx - (mx - v.tx) * k, ty: my - (my - v.ty) * k });
     });
   }
 
@@ -381,10 +435,10 @@ function MapBoard({
           }}
         />
         <div className="actions" style={{ marginTop: 8, gap: 6, flexWrap: "wrap" }}>
-          <button className="btn ghost" onClick={() => setView((v) => zoomBy(v, 1.3, canvasRef.current))}>
+          <button className="btn ghost" onClick={() => doZoom(1.3)}>
             + Zoom
           </button>
-          <button className="btn ghost" onClick={() => setView((v) => zoomBy(v, 1 / 1.3, canvasRef.current))}>
+          <button className="btn ghost" onClick={() => doZoom(1 / 1.3)}>
             − Zoom
           </button>
           <button className="btn ghost" onClick={fitWorld}>
@@ -504,14 +558,4 @@ function withAlpha(hex: string, a: number): string {
 
 function clamp(v: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, v));
-}
-
-function zoomBy(v: { scale: number; tx: number; ty: number }, factor: number, canvas: HTMLCanvasElement | null) {
-  const cssW = canvas?.clientWidth ?? 360;
-  const cssH = canvas?.clientHeight ?? 480;
-  const ns = clamp(v.scale * factor, 0.06, 4);
-  const k = ns / v.scale;
-  const mx = cssW / 2;
-  const my = cssH / 2;
-  return { scale: ns, tx: mx - (mx - v.tx) * k, ty: my - (my - v.ty) * k };
 }

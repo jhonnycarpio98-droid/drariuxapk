@@ -40,6 +40,13 @@ export const NewsIcon = (p: P) => (
   </svg>
 );
 
+export const NexusIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M4 5h16v11H8l-4 3V5Z" />
+    <path d="M8 9h8M8 12h5" />
+  </svg>
+);
+
 export const KingdomIcon = (p: P) => (
   <svg {...base(p)}>
     <path d="M4 8l3 3 5-6 5 6 3-3v9H4V8Z" />
