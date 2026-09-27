@@ -1,0 +1,1061 @@
+{
+  "$schema": "civitas-asset-library/v1",
+  "format": {
+    "type": "svg",
+    "transparent": true,
+    "size": "128x128",
+    "style": "flat game icon, contorno #2f3338, paleta Drariux"
+  },
+  "counts": {
+    "biomes": 10,
+    "crops": 48,
+    "livestock": 20,
+    "units": 6,
+    "resources": 9,
+    "consumables": 20,
+    "categories": 14,
+    "ui": 8,
+    "ready": 93,
+    "total": 135
+  },
+  "assets": [
+    {
+      "id": "pradera",
+      "name": "Pradera",
+      "category": "biomes",
+      "file": "biomes/pradera.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "llanura",
+      "name": "Llanura",
+      "category": "biomes",
+      "file": "biomes/llanura.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "bosque",
+      "name": "Bosque",
+      "category": "biomes",
+      "file": "biomes/bosque.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "tundra",
+      "name": "Tundra",
+      "category": "biomes",
+      "file": "biomes/tundra.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "desierto",
+      "name": "Desierto",
+      "category": "biomes",
+      "file": "biomes/desierto.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "jungla",
+      "name": "Jungla",
+      "category": "biomes",
+      "file": "biomes/jungla.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "pantano",
+      "name": "Pantano",
+      "category": "biomes",
+      "file": "biomes/pantano.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "montana",
+      "name": "Montana",
+      "category": "biomes",
+      "file": "biomes/montana.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "oceano",
+      "name": "Oceano",
+      "category": "biomes",
+      "file": "biomes/oceano.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "hielo",
+      "name": "Hielo",
+      "category": "biomes",
+      "file": "biomes/hielo.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "trigo",
+      "name": "Trigo",
+      "category": "crops",
+      "file": "crops/trigo.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "trigo_invierno",
+      "name": "Trigo de Invierno",
+      "category": "crops",
+      "file": "crops/trigo_invierno.png",
+      "status": "pending"
+    },
+    {
+      "id": "centeno",
+      "name": "Centeno",
+      "category": "crops",
+      "file": "crops/centeno.png",
+      "status": "pending"
+    },
+    {
+      "id": "cebada",
+      "name": "Cebada",
+      "category": "crops",
+      "file": "crops/cebada.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "avena",
+      "name": "Avena",
+      "category": "crops",
+      "file": "crops/avena.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "maiz",
+      "name": "Maíz",
+      "category": "crops",
+      "file": "crops/maiz.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "mijo",
+      "name": "Mijo",
+      "category": "crops",
+      "file": "crops/mijo.png",
+      "status": "pending"
+    },
+    {
+      "id": "sorgo",
+      "name": "Sorgo",
+      "category": "crops",
+      "file": "crops/sorgo.png",
+      "status": "pending"
+    },
+    {
+      "id": "arroz",
+      "name": "Arroz",
+      "category": "crops",
+      "file": "crops/arroz.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "papa",
+      "name": "Papa",
+      "category": "crops",
+      "file": "crops/papa.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "batata",
+      "name": "Batata",
+      "category": "crops",
+      "file": "crops/batata.png",
+      "status": "pending"
+    },
+    {
+      "id": "soya",
+      "name": "Soya",
+      "category": "crops",
+      "file": "crops/soya.png",
+      "status": "pending"
+    },
+    {
+      "id": "frijol",
+      "name": "Frijol",
+      "category": "crops",
+      "file": "crops/frijol.png",
+      "status": "pending"
+    },
+    {
+      "id": "haba",
+      "name": "Haba",
+      "category": "crops",
+      "file": "crops/haba.png",
+      "status": "pending"
+    },
+    {
+      "id": "guisante",
+      "name": "Guisante (Arveja)",
+      "category": "crops",
+      "file": "crops/guisante.png",
+      "status": "pending"
+    },
+    {
+      "id": "lenteja",
+      "name": "Lenteja",
+      "category": "crops",
+      "file": "crops/lenteja.png",
+      "status": "pending"
+    },
+    {
+      "id": "garbanzo",
+      "name": "Garbanzo",
+      "category": "crops",
+      "file": "crops/garbanzo.png",
+      "status": "pending"
+    },
+    {
+      "id": "sesamo",
+      "name": "Sésamo",
+      "category": "crops",
+      "file": "crops/sesamo.png",
+      "status": "pending"
+    },
+    {
+      "id": "girasol",
+      "name": "Girasol",
+      "category": "crops",
+      "file": "crops/girasol.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "colza",
+      "name": "Colza",
+      "category": "crops",
+      "file": "crops/colza.png",
+      "status": "pending"
+    },
+    {
+      "id": "remolacha",
+      "name": "Remolacha",
+      "category": "crops",
+      "file": "crops/remolacha.png",
+      "status": "pending"
+    },
+    {
+      "id": "zanahoria",
+      "name": "Zanahoria",
+      "category": "crops",
+      "file": "crops/zanahoria.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "algodon",
+      "name": "Algodón",
+      "category": "crops",
+      "file": "crops/algodon.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "lino_fibra",
+      "name": "Lino (Fibra)",
+      "category": "crops",
+      "file": "crops/lino_fibra.png",
+      "status": "pending"
+    },
+    {
+      "id": "lino_semilla",
+      "name": "Lino (Semilla)",
+      "category": "crops",
+      "file": "crops/lino_semilla.png",
+      "status": "pending"
+    },
+    {
+      "id": "cannabis_fibra",
+      "name": "Cáñamo (Fibra)",
+      "category": "crops",
+      "file": "crops/cannabis_fibra.png",
+      "status": "pending"
+    },
+    {
+      "id": "cannabis_semilla",
+      "name": "Cáñamo (Semilla)",
+      "category": "crops",
+      "file": "crops/cannabis_semilla.png",
+      "status": "pending"
+    },
+    {
+      "id": "yute",
+      "name": "Yute",
+      "category": "crops",
+      "file": "crops/yute.png",
+      "status": "pending"
+    },
+    {
+      "id": "sisal",
+      "name": "Sisal",
+      "category": "crops",
+      "file": "crops/sisal.png",
+      "status": "pending"
+    },
+    {
+      "id": "pasto_frio",
+      "name": "Pasto (Frío)",
+      "category": "crops",
+      "file": "crops/pasto_frio.png",
+      "status": "pending"
+    },
+    {
+      "id": "pasto_calido",
+      "name": "Pasto (Cálido)",
+      "category": "crops",
+      "file": "crops/pasto_calido.png",
+      "status": "pending"
+    },
+    {
+      "id": "alfalfa",
+      "name": "Alfalfa",
+      "category": "crops",
+      "file": "crops/alfalfa.png",
+      "status": "pending"
+    },
+    {
+      "id": "trebol",
+      "name": "Trébol",
+      "category": "crops",
+      "file": "crops/trebol.png",
+      "status": "pending"
+    },
+    {
+      "id": "cana_azucar",
+      "name": "Caña de Azúcar",
+      "category": "crops",
+      "file": "crops/cana_azucar.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "lupulo",
+      "name": "Lúpulo",
+      "category": "crops",
+      "file": "crops/lupulo.png",
+      "status": "pending"
+    },
+    {
+      "id": "vid",
+      "name": "Vid",
+      "category": "crops",
+      "file": "crops/vid.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "olivo",
+      "name": "Olivo",
+      "category": "crops",
+      "file": "crops/olivo.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "manzano",
+      "name": "Manzano",
+      "category": "crops",
+      "file": "crops/manzano.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "peral",
+      "name": "Peral",
+      "category": "crops",
+      "file": "crops/peral.png",
+      "status": "pending"
+    },
+    {
+      "id": "durazno",
+      "name": "Durazno",
+      "category": "crops",
+      "file": "crops/durazno.png",
+      "status": "pending"
+    },
+    {
+      "id": "naranjo",
+      "name": "Naranjo",
+      "category": "crops",
+      "file": "crops/naranjo.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "limonero",
+      "name": "Limonero",
+      "category": "crops",
+      "file": "crops/limonero.png",
+      "status": "pending"
+    },
+    {
+      "id": "higo",
+      "name": "Higo",
+      "category": "crops",
+      "file": "crops/higo.png",
+      "status": "pending"
+    },
+    {
+      "id": "almendro",
+      "name": "Almendro",
+      "category": "crops",
+      "file": "crops/almendro.png",
+      "status": "pending"
+    },
+    {
+      "id": "nogal",
+      "name": "Nogal",
+      "category": "crops",
+      "file": "crops/nogal.png",
+      "status": "pending"
+    },
+    {
+      "id": "castano",
+      "name": "Castaño",
+      "category": "crops",
+      "file": "crops/castano.png",
+      "status": "pending"
+    },
+    {
+      "id": "sandia",
+      "name": "Sandía",
+      "category": "crops",
+      "file": "crops/sandia.png",
+      "status": "pending"
+    },
+    {
+      "id": "melon",
+      "name": "Melón",
+      "category": "crops",
+      "file": "crops/melon.png",
+      "status": "pending"
+    },
+    {
+      "id": "dairy_cow",
+      "name": "Vaca",
+      "category": "livestock",
+      "file": "livestock/dairy_cow.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "sheep",
+      "name": "Oveja",
+      "category": "livestock",
+      "file": "livestock/sheep.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "dairy_goat",
+      "name": "Cabra",
+      "category": "livestock",
+      "file": "livestock/dairy_goat.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "mare",
+      "name": "Caballo",
+      "category": "livestock",
+      "file": "livestock/mare.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "yak",
+      "name": "Yak",
+      "category": "livestock",
+      "file": "livestock/yak.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "camel",
+      "name": "Camello",
+      "category": "livestock",
+      "file": "livestock/camel.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "water_buffalo",
+      "name": "Búfalo",
+      "category": "livestock",
+      "file": "livestock/water_buffalo.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "donkey",
+      "name": "Burro",
+      "category": "livestock",
+      "file": "livestock/donkey.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "llama",
+      "name": "Llama",
+      "category": "livestock",
+      "file": "livestock/llama.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "alpaca",
+      "name": "Alpaca",
+      "category": "livestock",
+      "file": "livestock/alpaca.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "zebu",
+      "name": "Cebú",
+      "category": "livestock",
+      "file": "livestock/zebu.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "chicken",
+      "name": "Gallina",
+      "category": "livestock",
+      "file": "livestock/chicken.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "turkey",
+      "name": "Pavo",
+      "category": "livestock",
+      "file": "livestock/turkey.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "rabbit",
+      "name": "Conejo",
+      "category": "livestock",
+      "file": "livestock/rabbit.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "duck",
+      "name": "Pato",
+      "category": "livestock",
+      "file": "livestock/duck.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "goose",
+      "name": "Ganso",
+      "category": "livestock",
+      "file": "livestock/goose.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "quail",
+      "name": "Codorniz",
+      "category": "livestock",
+      "file": "livestock/quail.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "guinea_fowl",
+      "name": "Pintada",
+      "category": "livestock",
+      "file": "livestock/guinea_fowl.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "pigeon",
+      "name": "Paloma",
+      "category": "livestock",
+      "file": "livestock/pigeon.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "ostrich",
+      "name": "Avestruz",
+      "category": "livestock",
+      "file": "livestock/ostrich.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "archer",
+      "name": "Arquero",
+      "category": "units",
+      "file": "units/archer.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "swordsman",
+      "name": "Espadachín",
+      "category": "units",
+      "file": "units/swordsman.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "spearman",
+      "name": "Lancero",
+      "category": "units",
+      "file": "units/spearman.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "horseman",
+      "name": "Jinete",
+      "category": "units",
+      "file": "units/horseman.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "berber",
+      "name": "Bereber",
+      "category": "units",
+      "file": "units/berber.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "scimitar_warrior",
+      "name": "Guerrero de Cimitarra",
+      "category": "units",
+      "file": "units/scimitar_warrior.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "madera",
+      "name": "Madera",
+      "category": "resources",
+      "file": "resources/madera.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "piedra",
+      "name": "Piedra",
+      "category": "resources",
+      "file": "resources/piedra.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "hierro",
+      "name": "Hierro",
+      "category": "resources",
+      "file": "resources/hierro.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "plata",
+      "name": "Plata",
+      "category": "resources",
+      "file": "resources/plata.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "oro",
+      "name": "Oro",
+      "category": "resources",
+      "file": "resources/oro.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "cobre",
+      "name": "Cobre",
+      "category": "resources",
+      "file": "resources/cobre.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "arcilla",
+      "name": "Arcilla",
+      "category": "resources",
+      "file": "resources/arcilla.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "sal",
+      "name": "Sal",
+      "category": "resources",
+      "file": "resources/sal.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "aceite",
+      "name": "Aceite",
+      "category": "resources",
+      "file": "resources/aceite.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "honey",
+      "name": "Miel",
+      "category": "consumables",
+      "file": "consumables/honey.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "milk",
+      "name": "Leche",
+      "category": "consumables",
+      "file": "consumables/milk.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "goat_milk",
+      "name": "Leche de Cabra",
+      "category": "consumables",
+      "file": "consumables/goat_milk.png",
+      "status": "pending"
+    },
+    {
+      "id": "yak_meat",
+      "name": "Carne de Yak",
+      "category": "consumables",
+      "file": "consumables/yak_meat.png",
+      "status": "pending"
+    },
+    {
+      "id": "quail_eggs",
+      "name": "Huevos de Codorniz",
+      "category": "consumables",
+      "file": "consumables/quail_eggs.png",
+      "status": "pending"
+    },
+    {
+      "id": "camel_milk",
+      "name": "Leche de Camella",
+      "category": "consumables",
+      "file": "consumables/camel_milk.png",
+      "status": "pending"
+    },
+    {
+      "id": "wool_cloth",
+      "name": "Tela de Lana Fina",
+      "category": "consumables",
+      "file": "consumables/wool_cloth.png",
+      "status": "pending"
+    },
+    {
+      "id": "silk",
+      "name": "Seda",
+      "category": "consumables",
+      "file": "consumables/silk.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "cashmere",
+      "name": "Cachemira",
+      "category": "consumables",
+      "file": "consumables/cashmere.png",
+      "status": "pending"
+    },
+    {
+      "id": "eggs",
+      "name": "Huevos",
+      "category": "consumables",
+      "file": "consumables/eggs.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "meat",
+      "name": "Carne",
+      "category": "consumables",
+      "file": "consumables/meat.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "bread",
+      "name": "Pan",
+      "category": "consumables",
+      "file": "consumables/bread.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "wine",
+      "name": "Vino",
+      "category": "consumables",
+      "file": "consumables/wine.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "beer",
+      "name": "Cerveza",
+      "category": "consumables",
+      "file": "consumables/beer.png",
+      "status": "pending"
+    },
+    {
+      "id": "cheese",
+      "name": "Queso",
+      "category": "consumables",
+      "file": "consumables/cheese.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "fish",
+      "name": "Pescado",
+      "category": "consumables",
+      "file": "consumables/fish.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "fruit",
+      "name": "Fruta",
+      "category": "consumables",
+      "file": "consumables/fruit.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "vegetables",
+      "name": "Verduras",
+      "category": "consumables",
+      "file": "consumables/vegetables.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "herbs",
+      "name": "Hierbas Medicinales",
+      "category": "consumables",
+      "file": "consumables/herbs.png",
+      "status": "pending"
+    },
+    {
+      "id": "spices",
+      "name": "Especias",
+      "category": "consumables",
+      "file": "consumables/spices.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "grano",
+      "name": "Grano",
+      "category": "categories",
+      "file": "categories/grano.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "verdura",
+      "name": "Verdura",
+      "category": "categories",
+      "file": "categories/verdura.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "fruta",
+      "name": "Fruta",
+      "category": "categories",
+      "file": "categories/fruta.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "fibra",
+      "name": "Fibra",
+      "category": "categories",
+      "file": "categories/fibra.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "lacteo",
+      "name": "Lácteo",
+      "category": "categories",
+      "file": "categories/lacteo.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "huevo",
+      "name": "Huevo",
+      "category": "categories",
+      "file": "categories/huevo.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "carne",
+      "name": "Carne",
+      "category": "categories",
+      "file": "categories/carne.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "subproducto_animal",
+      "name": "Subproducto Animal",
+      "category": "categories",
+      "file": "categories/subproducto_animal.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "forraje",
+      "name": "Forraje",
+      "category": "categories",
+      "file": "categories/forraje.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "fruto_seco",
+      "name": "Fruto Seco",
+      "category": "categories",
+      "file": "categories/fruto_seco.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "tuberculo",
+      "name": "Tubérculo",
+      "category": "categories",
+      "file": "categories/tuberculo.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "legumbre",
+      "name": "Legumbre",
+      "category": "categories",
+      "file": "categories/legumbre.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "semilla_oleaginosa",
+      "name": "Semilla Oleaginosa",
+      "category": "categories",
+      "file": "categories/semilla_oleaginosa.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "hortaliza",
+      "name": "Hortaliza",
+      "category": "categories",
+      "file": "categories/hortaliza.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "drx",
+      "name": "Ficha DRX",
+      "category": "ui",
+      "file": "ui/drx.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "crown",
+      "name": "Corona",
+      "category": "ui",
+      "file": "ui/crown.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "house",
+      "name": "Casa noble",
+      "category": "ui",
+      "file": "ui/house.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "pop",
+      "name": "Población",
+      "category": "ui",
+      "file": "ui/pop.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "food",
+      "name": "Comida",
+      "category": "ui",
+      "file": "ui/food.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "market",
+      "name": "Mercado",
+      "category": "ui",
+      "file": "ui/market.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "army",
+      "name": "Ejército",
+      "category": "ui",
+      "file": "ui/army.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "family",
+      "name": "Familia",
+      "category": "ui",
+      "file": "ui/family.svg",
+      "status": "ready",
+      "ext": "svg"
+    }
+  ]
+}

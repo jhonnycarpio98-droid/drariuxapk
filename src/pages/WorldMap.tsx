@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, type MapRegionInfo, type MapState } from "@/api/client";
-import { QueryBoundary } from "@/components/ui";
+import { QueryBoundary, GameIcon } from "@/components/ui";
 
 // ---------------------------------------------------------------------------
 // Paleta y tablas (coherentes con world/map_data.py del motor)
@@ -455,6 +455,7 @@ function MapBoard({
       {selCell ? (
         <div className="card">
           <h2 style={{ textTransform: "capitalize" }}>
+            <GameIcon id={selCell.biome} category="biomes" size={26} />
             {TERRAIN_NAMES[selCell.biome] ?? selCell.biome}
             {selCell.oasis ? " · oasis" : ""}
           </h2>

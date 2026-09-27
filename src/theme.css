@@ -179,6 +179,15 @@ a {
   word-break: break-all;
 }
 
+/* Icono de entidad de la librería de assets (recurso/cultivo/unidad/bioma). */
+.gicon {
+  display: inline-block;
+  vertical-align: -5px;
+  margin-right: 7px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+
 button,
 .btn {
   background: linear-gradient(180deg, var(--gold), var(--gold-dim));

@@ -50,7 +50,12 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   if (token) headers["Authorization"] = `Token ${token}`;
 
   const res = await fetch(apiUrl(path), {
-    credentials: "include", // sesión por cookie/token del motor
+    // Auth por token (cabecera Authorization), NO por cookie de sesión. Enviar
+    // credentials haría que el navegador/WebView exigiera Access-Control-Allow-
+    // Credentials en una petición cross-origin (origen https://localhost en el
+    // APK), y el motor no lo manda => "error de red". Con "omit" la CORS simple
+    // ya pasa y el token viaja igual en la cabecera.
+    credentials: "omit",
     ...init,
     headers,
   });

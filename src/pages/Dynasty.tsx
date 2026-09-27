@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { api, type FamilyMember, type DynastyState } from "@/api/client";
-import { QueryBoundary, money } from "@/components/ui";
+import { QueryBoundary, money, GameIcon } from "@/components/ui";
 
 const SUBS = ["Líder", "Árbol", "Gestionar", "Tesorería", "Producción"] as const;
 
@@ -66,7 +66,10 @@ export default function Dynasty() {
                 ) : (
                   d.treasury.goods.map((g) => (
                     <div className="row" key={g.item}>
-                      <span>{g.name}</span>
+                      <span>
+                        <GameIcon id={g.item} />
+                        {g.name}
+                      </span>
                       <span>{g.amount.toLocaleString("es")}</span>
                     </div>
                   ))

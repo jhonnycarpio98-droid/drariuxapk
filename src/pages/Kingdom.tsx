@@ -7,7 +7,7 @@ import {
   type CommerceRequest,
   type PopulationCensus,
 } from "@/api/client";
-import { QueryBoundary } from "@/components/ui";
+import { QueryBoundary, GameIcon } from "@/components/ui";
 
 const SUBS = ["Gestión", "Regencia", "Población", "Comercio", "Ejército"] as const;
 
@@ -227,6 +227,7 @@ function PopulationPanel() {
               d.provinces.map((p) => (
                 <div className="card" key={p.dbref}>
                   <h2>
+                    <GameIcon id={p.biome} category="biomes" />
                     {p.provincia}{" "}
                     <span className="muted">
                       · {p.biome}
@@ -376,6 +377,7 @@ function CofreCard({
         d.cofre.map((c) => (
           <div className="row" key={c.item}>
             <span>
+              <GameIcon id={c.item} />
               {c.nombre} <span className="muted">×{c.qty}</span>
             </span>
             <span>
@@ -425,6 +427,7 @@ function RequestsCard({
         reqs.map((r) => (
           <div className="row" key={r.id}>
             <div>
+              <GameIcon id={r.item} />
               {r.buyer_house} → {r.seller_house}
               <span className="muted">
                 {" "}
@@ -456,6 +459,7 @@ function CatalogCard({
           <div className="row" key={`${row.seller_account}-${row.item}`}>
             <div>
               <span className="pill">{row.house}</span>{" "}
+              <GameIcon id={row.item} />
               {row.nombre} <span className="muted">· {row.available} disp.</span>{" "}
               <span className="muted">@ {row.price} 🪙</span>
             </div>
@@ -549,7 +553,7 @@ function ArmyPanel() {
               {c.soldiers.map((s) => (
                 <div className="row" key={s.id}>
                   <div>
-                    #{s.id} {s.esp_nombre}{" "}
+                    <GameIcon id={s.esp} category="units" />#{s.id} {s.esp_nombre}{" "}
                     {s.montado && <span className="pill horse">jinete</span>}
                   </div>
                   <span className="muted">
