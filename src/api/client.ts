@@ -41,6 +41,39 @@ export function isAuthenticated(): boolean {
   return !!getToken();
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+// Estados que merecen reintento: caídas transitorias del motor/borde (5xx,
+// timeouts, rate-limit). Un 4xx real (401/403/400) NO se reintenta.
+const RETRYABLE_STATUS = new Set([408, 429, 500, 502, 503, 504, 520, 521, 522, 524, 525]);
+
+/**
+ * fetch con reintento automático y espera creciente. Absorbe los micro-cortes
+ * intermitentes entre el dispositivo y Cloudflare/Evennia que antes se
+ * traducían en "no se pudo conectar" a la primera de cambio.
+ */
+async function fetchWithRetry(
+  url: string,
+  init: RequestInit,
+  attempts = 3
+): Promise<Response> {
+  let lastErr: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const res = await fetch(url, init);
+      if ((res.status >= 500 || RETRYABLE_STATUS.has(res.status)) && i < attempts - 1) {
+        await sleep(400 * (i + 1));
+        continue; // reintento ante estado transitorio
+      }
+      return res;
+    } catch (e) {
+      lastErr = e;
+      if (i < attempts - 1) await sleep(400 * (i + 1));
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error("Fallo de red");
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
@@ -49,7 +82,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   };
   if (token) headers["Authorization"] = `Token ${token}`;
 
-  const res = await fetch(apiUrl(path), {
+  const res = await fetchWithRetry(apiUrl(path), {
     // Auth por token (cabecera Authorization), NO por cookie de sesión. Enviar
     // credentials haría que el navegador/WebView exigiera Access-Control-Allow-
     // Credentials en una petición cross-origin (origen https://localhost en el

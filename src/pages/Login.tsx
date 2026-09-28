@@ -80,13 +80,14 @@ export default function Login({ onAuthed }: { onAuthed: () => void }) {
         );
       } else if (err instanceof ApiError) {
         setError(
-          msg ||
+          (msg ||
             (err.status === 401
               ? "Usuario o contraseña incorrectos."
-              : "No se pudo conectar con el servidor."),
+              : "No se pudo conectar con el servidor.")) + ` [HTTP ${err.status}]`
         );
       } else {
-        setError("Error de red. Revisa la conexión.");
+        const detail = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+        setError(`Error de red. Revisa la conexión. (${detail})`);
       }
     } finally {
       setBusy(false);

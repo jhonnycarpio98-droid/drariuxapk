@@ -5,3 +5,6 @@ apk_out/
 # android native (regenerable con `npm run cap:add:android`)
 android/
 .DS_Store
+
+# local CI-downloaded APK artifacts
+apk/
