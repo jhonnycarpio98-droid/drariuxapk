@@ -20,8 +20,15 @@ export const CONFIG = {
 } as const;
 
 export function apiUrl(path: string): string {
-  const base = CONFIG.apiBaseUrl.replace(/\/$/, "");
+  let base = CONFIG.apiBaseUrl.replace(/\/$/, "");
   const clean = path.startsWith("/") ? path : `/${path}`;
+  // Las rutas del cliente YA llevan el prefijo /api/ (p. ej. "/api/auth/login/").
+  // En producción la base puede venir definida como "https://…/api" (inyección de
+  // CI), lo que produciría un doble /api/api/ => 404. Si base termina en /api y la
+  // ruta ya empieza por /api/, se recorta el /api de la base para no duplicarlo.
+  if (base.endsWith("/api") && clean.startsWith("/api/")) {
+    base = base.slice(0, -"/api".length);
+  }
   // En dev, base vacío => el proxy de Vite sirve /api/*.
   return `${base}${clean}`;
 }
