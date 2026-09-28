@@ -661,6 +661,7 @@ export interface BuildingFief {
   fy: number;
   biome: string;
   is_capital: boolean;
+  role?: "owner" | "admin" | "capital";
   buildings: BuildingLevel[];
   workers: number;
   receta: Record<string, string[]>;

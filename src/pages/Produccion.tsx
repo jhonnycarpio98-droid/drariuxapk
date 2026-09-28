@@ -192,6 +192,8 @@ function FiefBuildCard({
       <div className="row" style={{ alignItems: "center" }}>
         <strong>Feudo {f.coords} · {f.biome}</strong>
         {f.is_capital && <span className="pill live">capital</span>}
+        {f.role === "admin" && <span className="pill mock">administrado</span>}
+        {f.role === "capital" && <span className="pill mock">ciudadela (provincia)</span>}
       </div>
 
       {f.buildings.length === 0 && (
