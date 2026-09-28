@@ -8,15 +8,16 @@
   },
   "counts": {
     "biomes": 10,
-    "crops": 48,
-    "livestock": 20,
+    "crops": 12,
+    "livestock": 17,
     "units": 6,
-    "resources": 9,
-    "consumables": 20,
+    "resources": 18,
+    "consumables": 12,
     "categories": 14,
+    "buildings": 5,
     "ui": 8,
-    "ready": 93,
-    "total": 135
+    "ready": 102,
+    "total": 102
   },
   "assets": [
     {
@@ -138,14 +139,6 @@
       "ext": "svg"
     },
     {
-      "id": "maiz",
-      "name": "Maíz",
-      "category": "crops",
-      "file": "crops/maiz.svg",
-      "status": "ready",
-      "ext": "svg"
-    },
-    {
       "id": "mijo",
       "name": "Mijo",
       "category": "crops",
@@ -168,25 +161,10 @@
       "ext": "svg"
     },
     {
-      "id": "papa",
-      "name": "Papa",
-      "category": "crops",
-      "file": "crops/papa.svg",
-      "status": "ready",
-      "ext": "svg"
-    },
-    {
       "id": "batata",
       "name": "Batata",
       "category": "crops",
       "file": "crops/batata.png",
-      "status": "pending"
-    },
-    {
-      "id": "soya",
-      "name": "Soya",
-      "category": "crops",
-      "file": "crops/soya.png",
       "status": "pending"
     },
     {
@@ -230,14 +208,6 @@
       "category": "crops",
       "file": "crops/sesamo.png",
       "status": "pending"
-    },
-    {
-      "id": "girasol",
-      "name": "Girasol",
-      "category": "crops",
-      "file": "crops/girasol.svg",
-      "status": "ready",
-      "ext": "svg"
     },
     {
       "id": "colza",
@@ -346,13 +316,6 @@
       "file": "crops/cana_azucar.svg",
       "status": "ready",
       "ext": "svg"
-    },
-    {
-      "id": "lupulo",
-      "name": "Lúpulo",
-      "category": "crops",
-      "file": "crops/lupulo.png",
-      "status": "pending"
     },
     {
       "id": "vid",
@@ -514,22 +477,6 @@
       "ext": "svg"
     },
     {
-      "id": "llama",
-      "name": "Llama",
-      "category": "livestock",
-      "file": "livestock/llama.svg",
-      "status": "ready",
-      "ext": "svg"
-    },
-    {
-      "id": "alpaca",
-      "name": "Alpaca",
-      "category": "livestock",
-      "file": "livestock/alpaca.svg",
-      "status": "ready",
-      "ext": "svg"
-    },
-    {
       "id": "zebu",
       "name": "Cebú",
       "category": "livestock",
@@ -542,14 +489,6 @@
       "name": "Gallina",
       "category": "livestock",
       "file": "livestock/chicken.svg",
-      "status": "ready",
-      "ext": "svg"
-    },
-    {
-      "id": "turkey",
-      "name": "Pavo",
-      "category": "livestock",
-      "file": "livestock/turkey.svg",
       "status": "ready",
       "ext": "svg"
     },
@@ -820,21 +759,6 @@
       "ext": "svg"
     },
     {
-      "id": "wine",
-      "name": "Vino",
-      "category": "consumables",
-      "file": "consumables/wine.svg",
-      "status": "ready",
-      "ext": "svg"
-    },
-    {
-      "id": "beer",
-      "name": "Cerveza",
-      "category": "consumables",
-      "file": "consumables/beer.png",
-      "status": "pending"
-    },
-    {
       "id": "cheese",
       "name": "Queso",
       "category": "consumables",
@@ -1054,6 +978,134 @@
       "name": "Familia",
       "category": "ui",
       "file": "ui/family.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "galena",
+      "name": "Galena (mena de plata)",
+      "category": "resources",
+      "file": "resources/galena.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "azufre",
+      "name": "Azufre",
+      "category": "resources",
+      "file": "resources/azufre.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "carbon",
+      "name": "Carbón vegetal",
+      "category": "resources",
+      "file": "resources/carbon.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "arena",
+      "name": "Arena",
+      "category": "resources",
+      "file": "resources/arena.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "soda",
+      "name": "Soda (sosa)",
+      "category": "resources",
+      "file": "resources/soda.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "perlas",
+      "name": "Perlas",
+      "category": "resources",
+      "file": "resources/perlas.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "estopas",
+      "name": "Estopas",
+      "category": "resources",
+      "file": "resources/estopas.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "seda_cruda",
+      "name": "Seda cruda",
+      "category": "resources",
+      "file": "resources/seda_cruda.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "capullo_seda",
+      "name": "Capullo de seda",
+      "category": "resources",
+      "file": "resources/capullo_seda.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "pasa",
+      "name": "Pasa (uva seca)",
+      "category": "consumables",
+      "file": "consumables/pasa.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "hoja_morera",
+      "name": "Hoja de morera",
+      "category": "crops",
+      "file": "crops/hoja_morera.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "mina_plata",
+      "name": "Mina de plata",
+      "category": "buildings",
+      "file": "buildings/mina_plata.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "beneficio",
+      "name": "Beneficio (copelación)",
+      "category": "buildings",
+      "file": "buildings/beneficio.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "barrillera",
+      "name": "Barrillera (sosa)",
+      "category": "buildings",
+      "file": "buildings/barrillera.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "pesqueria_perlas",
+      "name": "Pesquería de perlas",
+      "category": "buildings",
+      "file": "buildings/pesqueria_perlas.svg",
+      "status": "ready",
+      "ext": "svg"
+    },
+    {
+      "id": "sericicultura",
+      "name": "Sericicultura",
+      "category": "buildings",
+      "file": "buildings/sericicultura.svg",
       "status": "ready",
       "ext": "svg"
     }

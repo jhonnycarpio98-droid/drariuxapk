@@ -83,14 +83,18 @@ a {
 }
 
 .tab {
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  font-size: 11px;
+  font-size: 10px;
   color: var(--muted);
-  padding: 6px 10px;
+  padding: 6px 2px;
   border-radius: 10px;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .tab.active {
@@ -146,9 +150,37 @@ a {
 .row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
+  gap: 10px;
   padding: 8px 0;
   border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+
+/* t15: evita desbordes de texto largo (gobernanza/reino) en todo el app. */
+.row > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.row > .muted:first-child {
+  flex: 1 1 auto;
+}
+
+.card,
+.card h2,
+.card h3,
+.stat .v,
+.stat .k,
+.muted,
+.small {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.pill {
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .row:last-child {
@@ -369,9 +401,39 @@ select {
 
 /* --- Pantalla de acceso (login / registro) ------------------------------ */
 .topbar .btn {
-  margin-left: auto;
   padding: 6px 12px;
   font-size: 13px;
+}
+
+.topbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar-actions .btn.bell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.topbar-actions .badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
 }
 
 .login-wrap {
@@ -437,6 +499,104 @@ select {
   padding: 4px 0;
 }
 
+/* ---------------------------------------------------------------------------
+   Elección de inicio de partida (Login): 3 castas con info desplegable
+   --------------------------------------------------------------------------- */
+.start-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+
+.start-choice-title {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Control segmentado (p. ej. sexo del cabeza en el registro). */
+.seg {
+  display: inline-flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+.seg-btn {
+  flex: 1 1 auto;
+  padding: 8px 14px;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.seg-btn.selected {
+  border-color: var(--gold, var(--accent));
+  background: rgba(255, 255, 255, 0.06);
+  font-weight: 600;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.choice.selected {
+  border-color: var(--gold);
+  background: rgba(217, 180, 99, 0.08);
+}
+
+.choice-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  cursor: pointer;
+  margin: 0;
+}
+
+.choice input[type="radio"] {
+  accent-color: var(--gold);
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.choice-info {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--gold-dim);
+  background: transparent;
+  color: var(--gold);
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.choice-detail {
+  flex-basis: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.choice {
+  flex-wrap: wrap;
+}
+
 .bubble {
   align-self: flex-start;
   max-width: 80%;
@@ -456,4 +616,55 @@ select {
   display: block;
   margin-top: 4px;
   font-size: 11px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Modal de perfil de casa (t05) + nombre de casa clicable
+ * ------------------------------------------------------------------------- */
+.house-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--gold);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--gold-dim);
+  text-underline-offset: 2px;
+}
+.house-link:hover {
+  color: var(--text);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 440px;
+  max-height: 82vh;
+  overflow-y: auto;
+  padding: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
 }

@@ -69,10 +69,46 @@ export const ArmyIcon = (p: P) => (
   </svg>
 );
 
+export const AgricultureIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M12 21v-7" />
+    <path d="M12 14c-3 0-5-2-5-5 3 0 5 2 5 5Z" />
+    <path d="M12 14c3 0 5-2 5-5-3 0-5 2-5 5Z" />
+    <path d="M5 21h14" />
+  </svg>
+);
+
+export const ProductionIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M3 20h18" />
+    <path d="M4 20v-6h5v6" />
+    <path d="M9 14V8l5 3v3" />
+    <path d="M14 20v-9h6v9" />
+    <path d="M6 11V8M17 8V6" />
+  </svg>
+);
+
+export const LivestockIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M5 9c0-2 1.5-3.5 3.5-3.5S12 7 12 9" />
+    <path d="M4 14c0 2 1.5 3 3.5 3H10v3" />
+    <path d="M10 12h5l2 2v3h-2" />
+    <path d="M10 12V9" />
+    <circle cx="16" cy="8" r="1" fill="currentColor" stroke="none" />
+  </svg>
+);
+
 export const CoinIcon = (p: P) => (
   <svg {...base(p)}>
     <circle cx="12" cy="12" r="8" />
     <path d="M12 8v8M9.5 10h5M9.5 14h5" />
+  </svg>
+);
+
+export const BellIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M6 9a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6Z" />
+    <path d="M10 19a2 2 0 0 0 4 0" />
   </svg>
 );
 

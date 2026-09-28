@@ -68,4 +68,5 @@ export type GameCategory =
   | "resources"
   | "consumables"
   | "categories"
+  | "buildings"
   | "ui";

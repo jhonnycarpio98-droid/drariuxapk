@@ -43,6 +43,10 @@ export default function Dynasty() {
                       <span className="muted">Edad</span>
                       <span>{d.tree.head.age}</span>
                     </div>
+                    <div className="row">
+                      <span className="muted">Sexo</span>
+                      <span>{d.tree.head.gender === "mujer" ? "Mujer" : "Hombre"}</span>
+                    </div>
                     <MemberStats m={d.tree.head} />
                   </>
                 )}
@@ -118,7 +122,8 @@ function TreePanel({ d }: { d: DynastyState }) {
           {d.tree.head && (
             <div className="row">
               <div>
-                <strong>{d.tree.head.name}</strong> <span className="pill">Señor/a</span>
+                <strong>{d.tree.head.name}</strong> <span className="pill">Señor/a</span>{" "}
+                <span className="pill">{d.tree.head.gender === "mujer" ? "♀" : "♂"}</span>
               </div>
               <span className="muted">{d.tree.head.age} años</span>
             </div>
@@ -126,7 +131,8 @@ function TreePanel({ d }: { d: DynastyState }) {
           {d.tree.members.map((m) => (
             <div className="row" key={String(m.member_id)}>
               <div>
-                {m.name} <span className="pill">{m.role ?? "miembro"}</span>
+                {m.name} <span className="pill">{m.role ?? "miembro"}</span>{" "}
+                <span className="pill">{m.gender === "mujer" ? "♀" : "♂"}</span>
               </div>
               <span className="muted">{m.age} años</span>
             </div>
@@ -172,7 +178,11 @@ function ManagePanel({ d, onDone }: { d: DynastyState; onDone: () => void }) {
   const members = tree?.members ?? [];
   const isHead = d.leader.is_player;
 
-  const askName = (label: string) => window.prompt(label)?.trim() || null;
+  // El nombre del cónyuge se escribe en un campo inline: window.prompt está
+  // deshabilitado en el WebView de la app (devuelve null) y el botón parecía
+  // "no hacer nada".
+  const [headName, setHeadName] = useState("");
+  const headMarried = tree?.head?.spouse_id != null;
 
   return (
     <div>
@@ -193,57 +203,82 @@ function ManagePanel({ d, onDone }: { d: DynastyState; onDone: () => void }) {
 
       {tree && isHead && (
         <>
+          {!headMarried && (
+            <div className="card">
+              <h2>Sexo del cabeza</h2>
+              <p className="muted">
+                Su cónyuge será del sexo opuesto para continuar la línea. Solo
+                puede cambiarse antes de casarse.
+              </p>
+              <div className="seg" role="radiogroup" aria-label="sexo del cabeza">
+                <button
+                  type="button"
+                  className={"seg-btn" + (tree.head?.gender !== "mujer" ? " selected" : "")}
+                  disabled={busy}
+                  onClick={() => act.mutate({ action: "set_gender", gender: "hombre" })}
+                >
+                  Hombre
+                </button>
+                <button
+                  type="button"
+                  className={"seg-btn" + (tree.head?.gender === "mujer" ? " selected" : "")}
+                  disabled={busy}
+                  onClick={() => act.mutate({ action: "set_gender", gender: "mujer" })}
+                >
+                  Mujer
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="card">
             <h2>Matrimonio del cabeza</h2>
             <p className="muted">
-              {tree.head?.name ?? "Señor/a"} · {tree.head?.age ?? "—"} años. El cónyuge entra
-              en la casa y la pareja podrá tener descendencia con el tiempo.
+              {tree.head?.name ?? "Señor/a"} · {tree.head?.age ?? "—"} años. El cónyuge sale
+              de tu servidumbre (consume 1 jornalero contratado) y la pareja podrá tener
+              descendencia con el tiempo.
             </p>
-            <div className="actions">
-              <button
-                className="btn"
-                disabled={busy}
-                onClick={() => {
-                  const name = askName("Nombre del NPC con quien casar al cabeza:");
-                  if (name) act.mutate({ action: "marry_head", name });
-                }}
-              >
-                Casar cabeza
-              </button>
-            </div>
+            {headMarried ? (
+              <p className="muted">El cabeza ya está casado.</p>
+            ) : (
+              <>
+                <div className="row">
+                  <label className="muted" htmlFor="head-spouse">
+                    Nombre del cónyuge
+                  </label>
+                  <input
+                    id="head-spouse"
+                    type="text"
+                    maxLength={24}
+                    placeholder="p. ej. Alda"
+                    value={headName}
+                    onChange={(e) => setHeadName(e.target.value)}
+                    style={{ minWidth: 160 }}
+                  />
+                </div>
+                <div className="actions">
+                  <button
+                    className="btn"
+                    disabled={busy || headName.trim() === ""}
+                    onClick={() => {
+                      const name = headName.trim();
+                      if (!name) return;
+                      act.mutate({ action: "marry_head", name });
+                      setHeadName("");
+                    }}
+                  >
+                    Casar cabeza
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="card">
             <h2>Miembros</h2>
             {members.length === 0 && <p className="muted">No hay otros miembros todavía.</p>}
             {members.map((m) => (
-              <div className="row" key={String(m.member_id)}>
-                <div>
-                  {m.name} <span className="pill">{m.role ?? "miembro"}</span>
-                  <div className="muted" style={{ fontSize: 12 }}>
-                    {m.age} años{m.spouse_id != null ? " · casado/a" : ""}
-                  </div>
-                </div>
-                <div className="actions" style={{ gap: 6 }}>
-                  <button
-                    className="btn ghost"
-                    disabled={busy || m.spouse_id != null}
-                    onClick={() => {
-                      const name = askName(`Nombre del NPC para casar a ${m.name}:`);
-                      if (name) act.mutate({ action: "marry_member", member: m.name, name });
-                    }}
-                  >
-                    Casar
-                  </button>
-                  <button
-                    className="btn ghost"
-                    disabled={busy || m.role === "heredero"}
-                    onClick={() => act.mutate({ action: "heir", name: m.name })}
-                  >
-                    Heredero
-                  </button>
-                </div>
-              </div>
+              <MemberRow key={String(m.member_id)} m={m} busy={busy} act={act} />
             ))}
           </div>
 
@@ -251,6 +286,66 @@ function ManagePanel({ d, onDone }: { d: DynastyState; onDone: () => void }) {
             <p className={feedback.ok ? "ok" : "error"}>{feedback.msg}</p>
           )}
         </>
+      )}
+    </div>
+  );
+}
+
+function MemberRow({
+  m,
+  busy,
+  act,
+}: {
+  m: FamilyMember;
+  busy: boolean;
+  act: {
+    isPending: boolean;
+    mutate: (body: Record<string, unknown>) => void;
+  };
+}) {
+  const [name, setName] = useState("");
+  const married = m.spouse_id != null;
+  return (
+    <div className="card" style={{ background: "var(--bg-elev)" }}>
+      <div className="row">
+        <div>
+          {m.name} <span className="pill">{m.role ?? "miembro"}</span>{" "}
+          <span className="pill">{m.gender === "mujer" ? "♀" : "♂"}</span>
+          <div className="muted" style={{ fontSize: 12 }}>
+            {m.age} años{married ? " · casado/a" : ""}
+          </div>
+        </div>
+        <button
+          className="btn ghost"
+          disabled={busy || m.role === "heredero"}
+          onClick={() => act.mutate({ action: "heir", name: m.name })}
+        >
+          Heredero
+        </button>
+      </div>
+      {!married && (
+        <div className="row" style={{ marginTop: 6 }}>
+          <input
+            type="text"
+            maxLength={24}
+            placeholder={`cónyuge de ${m.name}`}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            style={{ minWidth: 140, flex: 1 }}
+          />
+          <button
+            className="btn ghost"
+            disabled={busy || name.trim() === ""}
+            onClick={() => {
+              const nm = name.trim();
+              if (!nm) return;
+              act.mutate({ action: "marry_member", member: m.name, name: nm });
+              setName("");
+            }}
+          >
+            Casar
+          </button>
+        </div>
       )}
     </div>
   );

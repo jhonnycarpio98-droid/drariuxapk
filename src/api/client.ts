@@ -99,10 +99,23 @@ export interface Soldier {
   energia: number;
 }
 
+export interface CampLogistics {
+  weapons: Record<string, number>;
+  arrows: number;
+  clothing: number;
+  forage: number;
+  grain: number;
+  mounted: number;
+  need_forage_day: number;
+  need_grain_day: number;
+  ropa_ciclo: number;
+}
+
 export interface CampView {
   dbref: string;
   key: string;
   house: string;
+  commander?: string;
   soldiers: Soldier[];
   count: number;
   power: number;
@@ -110,6 +123,10 @@ export interface CampView {
   commander_xp: number;
   last_pay_year: number | null;
   last_pay_amount: number | null;
+  prisoners?: number;
+  ropa_ciclo?: number;
+  is_detachment?: boolean;
+  logistics?: CampLogistics | null;
 }
 
 export interface ArmyState {
@@ -117,6 +134,19 @@ export interface ArmyState {
   province_dbref: string;
   house: string | null;
   camp: CampView | null;
+}
+
+export interface BattleResult {
+  winner: string;
+  loser: string;
+  biome?: string;
+  power_a?: number;
+  power_d?: number;
+  attacker_losses?: number;
+  defender_losses?: number;
+  deserters?: number;
+  rebelled?: boolean;
+  note?: string;
 }
 
 export interface TreasuryGood {
@@ -161,6 +191,22 @@ export interface DynastyState {
   };
 }
 
+export interface WalletPrice {
+  atom_usd: number;
+  rate_drx_per_usd: number;
+  source: string;
+}
+
+export interface FundQuote {
+  atom_amount: number;
+  atom_usd: number;
+  usd_value: number;
+  rate_drx_per_usd: number;
+  drx: number;
+  symbol: string;
+  price_source: string;
+}
+
 export interface WalletState {
   mode: "mock" | "live";
   address: string | null;
@@ -169,6 +215,7 @@ export interface WalletState {
   denom: string;
   symbol: string;
   chain_id: number;
+  price?: WalletPrice | null;
   log: { kind: string; amount: number; hash: string; addr: string }[];
 }
 
@@ -179,6 +226,49 @@ export interface KingdomState {
   polity?: Record<string, unknown>;
   management: Record<string, unknown>;
   regent: Record<string, unknown>;
+}
+
+// ---------------------------------------------------------------------------
+// Diplomacia entre reinos (Hito 9 / plan 2G)
+// ---------------------------------------------------------------------------
+export type DiploState =
+  | "war"
+  | "peace"
+  | "alliance"
+  | "vassalage_offer"
+  | "trade_agreement"
+  | "unknown";
+
+export interface DiplomacyRow {
+  kingdom: string;
+  house: string;
+  dbref: string;
+  state: DiploState;
+  they_offer: string | null;
+}
+
+export interface VassalRow {
+  house: string;
+  province: string;
+  province_dbref: string;
+  region: string | null;
+  is_rey: boolean;
+  at_war_with: string[];
+  exempt: Record<string, boolean>;
+}
+
+export interface DiplomacyState {
+  kingdom: { key: string; house: string; dbref: string };
+  states: DiplomacyRow[];
+  vassals: VassalRow[];
+}
+
+export interface KingdomHierarchy {
+  ok: boolean;
+  kingdom: string;
+  house: string;
+  vassals: VassalRow[];
+  report?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -194,11 +284,11 @@ export interface CommerceCofre {
 export interface CommerceListing {
   house: string;
   seller_account: number;
-  seller: string;
   item: string;
   nombre: string;
   price: number;
   available: number;
+  tradeable?: boolean | null; // t16: diplomacia permite comerciar con esa casa
 }
 
 export interface CommerceRequest {
@@ -213,6 +303,26 @@ export interface CommerceRequest {
   created: string;
 }
 
+// t17: pedido en ruta (caravana) con su ETA
+export interface CaravanOrder {
+  id: string;
+  as: "vendedor" | "comprador";
+  item: string;
+  nombre: string;
+  qty: number;
+  cost: number;
+  buyer_house: string;
+  seller_house: string;
+  depart_day: number;
+  arrive_day: number;
+  days_left: number;
+  cells: number;
+  local: boolean;
+  carts?: number;
+  serfs?: number;
+  weight_kg?: number;
+}
+
 export interface CommerceState {
   house: string;
   prices: Record<string, number>;
@@ -220,6 +330,7 @@ export interface CommerceState {
   catalog: CommerceListing[];
   incoming: CommerceRequest[];
   outgoing: CommerceRequest[];
+  caravans: CaravanOrder[];
 }
 
 export interface MapRegionInfo {
@@ -234,6 +345,18 @@ export interface MapRegionInfo {
   population: number;
 }
 
+export interface MapCampInfo {
+  q: number;
+  r: number;
+  key: string;
+  house: string | null;
+  count: number;
+  power: number;
+  moral: number | null;
+  ropa_ciclo: number;
+  prisoners: number;
+}
+
 export interface MapState {
   width: number;
   height: number;
@@ -241,6 +364,7 @@ export interface MapState {
   zones: string[]; // zona climática por fila (solo depende de la latitud)
   oasis: [number, number][]; // casillas con oasis
   regions: MapRegionInfo[]; // regiones materializadas (caminadas/exploradas)
+  camps?: MapCampInfo[]; // campamentos por región (plan 2I)
   player: [number, number] | null;
   character: string | null;
 }
@@ -252,6 +376,8 @@ export interface ActionResult {
   id?: number;
   camp_dbref?: string;
   state?: WalletState;
+  drx?: number;
+  quote?: FundQuote;
 }
 
 // ---------------------------------------------------------------------------
@@ -259,13 +385,11 @@ export interface ActionResult {
 // ---------------------------------------------------------------------------
 export interface NexusFriend {
   account_id: number;
-  name: string;
   house: string;
 }
 
 export interface NexusThread {
   account_id: number;
-  name: string;
   house: string;
   last: string;
   when: string | null;
@@ -283,9 +407,19 @@ export interface NexusMessage {
   unread: boolean;
 }
 
+export interface NexusSearchResult {
+  account_id: number;
+  house: string;
+  is_friend: boolean;
+  requested_by_them: boolean;
+  requested_by_you: boolean;
+}
+
 export interface NexusSummary {
   threads: NexusThread[];
   friends: NexusFriend[];
+  requests_in: NexusFriend[];
+  requests_out: NexusFriend[];
   counts: Record<string, number>;
 }
 
@@ -294,6 +428,27 @@ export interface NexusThreadView {
   with_house: string;
   is_friend: boolean;
   messages: NexusMessage[];
+}
+
+// ---------------------------------------------------------------------------
+// Perfil de casa (t05): rol político SIN exponer el nombre del jugador
+// ---------------------------------------------------------------------------
+export interface HouseProfile {
+  ok: boolean;
+  has_house: boolean;
+  house: string | null;
+  display?: string;
+  title?: string | null;
+  title_label?: string | null;
+  is_king?: boolean;
+  regions_governed?: number;
+  provinces?: { name: string; vassal: boolean }[];
+  overlord?: string | null;
+  king_house?: string | null;
+  member_count?: number;
+  is_friend?: boolean;
+  account_id?: number;
+  error?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -331,6 +486,187 @@ export interface PopulationCensus {
 }
 
 // ---------------------------------------------------------------------------
+// Agricultura feudal (Hito 5/6): feudos propios y administrados + jornaleros
+// ---------------------------------------------------------------------------
+export interface FiefStock {
+  item: string;
+  name: string;
+  amount: number;
+}
+
+export interface FiefCrop {
+  crop: string;
+  crop_name: string;
+  ha: number;
+  ready: boolean;
+  days_left: number;
+  perennial: boolean;
+}
+
+/** Composición del hato por especie (sexos/edades/gestantes), ver fiefs.hato_brief. */
+export interface HerdSpecies {
+  species: string;
+  name: string;
+  ugm_each: number;
+  heads: number;
+  female: number;
+  male: number;
+  juveniles: number;
+  gestantes: number;
+  adultas: number;
+}
+
+export interface HerdInfo {
+  ugm: number;
+  ugm_cap: number;
+  heads_total: number;
+  species: Record<string, HerdSpecies>;
+}
+
+/** Minas/extractivos del feudo (ver fiefs.extractive_brief). */
+export interface ExtractiveInfo {
+  type: string;
+  name: string;
+  level: number;
+  resource: string;
+  per_day_full: number;
+  reserve_remaining: number | null;
+  unlimited: boolean;
+  labor_per_level: number;
+}
+
+export interface FiefView {
+  coords: string;
+  fx: number;
+  fy: number;
+  biome: string;
+  fertility: number;
+  arable: number;
+  vegetation_pct?: number;
+  ha_cleared?: number;
+  ha_forestable?: number;
+  ha_pending?: number;
+  herd_ugm: number;
+  herd?: HerdInfo;
+  extractive?: ExtractiveInfo[];
+  mineral_reservas?: Record<string, number>;
+  crop: FiefCrop | null;
+  stock: FiefStock[];
+  role: "owner" | "admin";
+  overlord: string | null;
+  harvest_tax_pct: number | null;
+}
+
+export interface FiefsState {
+  province: string;
+  province_dbref: string;
+  house: string | null;
+  game_day: number;
+  fiefs: FiefView[];
+  is_senor: boolean;
+  harvest_tax_pct: number;
+}
+
+export interface LaborState {
+  house: string | null;
+  jornaleros: number;
+  max: number;
+  daily_grain_need: number;
+  cofre_cereal: number;
+  hire_cost: number;
+  pay_min: number;
+  current_year: number;
+  last_pay_year: number | null;
+  unpaid_this_year: boolean;
+  short_feed: boolean;
+  coins: number;
+}
+
+export interface CropOption {
+  id: string;
+  name: string;
+  days: number | null;
+  type: string | null;
+}
+
+export type CropsByBiome = Record<string, CropOption[]>;
+
+// ---------------------------------------------------------------------------
+// Produccion / edificios (t11): catalogo construible + construir/mejorar/
+// asignar trabajadores / elegir la salida de un taller.
+// ---------------------------------------------------------------------------
+export interface BuildingOutput {
+  item: string;
+  name: string;
+  insumos: Record<string, string>;
+  insumo_qty: Record<string, number>;
+  salida: number;
+  dias: number;
+  nivel: number;
+}
+
+export interface BuildingCatalogEntry {
+  type: string;
+  name: string;
+  cost: number[]; // [madera, piedra, cal, hierro]
+  scale: number;
+  max_level: number;
+  requires: string;
+  citadel_only: boolean;
+  outputs: BuildingOutput[];
+}
+
+export interface BuildingLevel {
+  type: string;
+  name: string;
+  level: number;
+}
+
+export interface BuildingFief {
+  coords: string;
+  fx: number;
+  fy: number;
+  biome: string;
+  is_capital: boolean;
+  buildings: BuildingLevel[];
+  workers: number;
+  receta: Record<string, string[]>;
+}
+
+export interface BuildingsState {
+  province: string;
+  province_dbref: string;
+  house: string | null;
+  catalog: BuildingCatalogEntry[];
+  fiefs: BuildingFief[];
+  cofre: { drariux: number; goods: TreasuryGood[] };
+}
+
+// ---------------------------------------------------------------------------
+// Notificaciones (feed de eventos de la propia casa/familia)
+// ---------------------------------------------------------------------------
+export type NotificationKind =
+  | "familia"
+  | "servidumbre"
+  | "gobierno"
+  | "economia"
+  | "militar"
+  | "alerta";
+
+export interface NotificationItem {
+  id: number;
+  text: string;
+  kind: NotificationKind | string;
+  day: number;
+  unread: boolean;
+}
+
+export interface NotificationsState {
+  counts: { total: number; unread: number; limit: number };
+  notifications: NotificationItem[];
+}
+
+// ---------------------------------------------------------------------------
 // API por sección
 // ---------------------------------------------------------------------------
 export const api = {
@@ -342,11 +678,24 @@ export const api = {
     request<KingdomState>(
       `/api/kingdom/${province ? `?province=${encodeURIComponent(province)}` : ""}`,
     ),
+  diplomacy: () => request<DiplomacyState>("/api/diplomacy/"),
+  kingdomHierarchy: () => request<KingdomHierarchy>("/api/kingdom/hierarchy/"),
   news: () => request<unknown>("/api/news/"),
   map: () => request<MapState>("/api/map/"),
   commerce: () => request<CommerceState>("/api/commerce/"),
   population: () => request<PopulationCensus>("/api/population/"),
+  fiefs: (province?: string) =>
+    request<FiefsState>(
+      `/api/fiefs/${province ? `?province=${encodeURIComponent(province)}` : ""}`,
+    ),
+  labor: () => request<LaborState>("/api/labor/"),
+  crops: () => request<{ by_biome: CropsByBiome }>("/api/crops/"),
+  buildings: (province?: string) =>
+    request<BuildingsState>(
+      `/api/buildings/${province ? `?province=${encodeURIComponent(province)}` : ""}`,
+    ),
   nexus: () => request<NexusSummary>("/api/nexus/"),
+  notifications: () => request<NotificationsState>("/api/notifications/"),
   nexusThread: (withRef: number | string) =>
     request<NexusThreadView>(`/api/nexus/?with=${encodeURIComponent(String(withRef))}`),
 
@@ -359,12 +708,23 @@ export const api = {
   walletAction: (body: Record<string, unknown>) =>
     request<ActionResult>("/api/wallet/action/", { method: "POST", body: JSON.stringify(body) }),
   armyAction: (body: Record<string, unknown>) =>
-    request<ActionResult>("/api/army/action/", { method: "POST", body: JSON.stringify(body) }),
+    request<
+      ActionResult & {
+        error?: string;
+        result?: BattleResult;
+        targets?: CampView[];
+      }
+    >("/api/army/action/", { method: "POST", body: JSON.stringify(body) }),
   kingdomAction: (body: Record<string, unknown>) =>
     request<ActionResult>("/api/kingdom/action/", {
       method: "POST",
       body: JSON.stringify(body),
     }),
+  diplomacyAction: (body: Record<string, unknown>) =>
+    request<ActionResult & { error?: string; states?: DiplomacyRow[] }>(
+      "/api/diplomacy/",
+      { method: "POST", body: JSON.stringify(body) },
+    ),
   kingdomInvite: (body: Record<string, unknown>) =>
     request<{ ok: boolean; code?: string; province?: string; error?: string }>(
       "/api/kingdom/invite/",
@@ -388,10 +748,44 @@ export const api = {
       "/api/population/",
       { method: "POST", body: JSON.stringify(body) },
     ),
+  fiefAction: (body: Record<string, unknown>) =>
+    request<
+      ActionResult & { harvested?: number; fief?: FiefView; fertility?: number; error?: string }
+    >("/api/fief/action/", { method: "POST", body: JSON.stringify(body) }),
+  laborAction: (body: Record<string, unknown>) =>
+    request<ActionResult>("/api/labor/action/", { method: "POST", body: JSON.stringify(body) }),
+  buildingAction: (body: Record<string, unknown>) =>
+    request<
+      ActionResult & {
+        error?: string;
+        buildings?: BuildingLevel[];
+        workers?: number;
+        receta?: Record<string, string[]>;
+      }
+    >("/api/building/action/", { method: "POST", body: JSON.stringify(body) }),
+  notificationsAction: (body: Record<string, unknown>) =>
+    request<ActionResult & { counts?: NotificationsState["counts"]; marked?: number }>(
+      "/api/notifications/",
+      { method: "POST", body: JSON.stringify(body) },
+    ),
+  harvestTaxAction: (pct: number, province?: string) =>
+    request<ActionResult & { harvest_tax_pct?: number; error?: string }>("/api/tax/harvest/", {
+      method: "POST",
+      body: JSON.stringify({ pct, province }),
+    }),
   nexusAction: (body: Record<string, unknown>) =>
     request<ActionResult & { error?: string; friends?: NexusFriend[]; to_house?: string }>(
       "/api/nexus/",
       { method: "POST", body: JSON.stringify(body) },
+    ),
+    nexusSearch: (q: string) =>
+    request<{ results: NexusSearchResult[] }>("/api/nexus/", {
+      method: "POST",
+      body: JSON.stringify({ action: "search", q }),
+    }),
+  houseProfile: (accountId: number | string) =>
+    request<HouseProfile>(
+      `/api/house/profile/?account=${encodeURIComponent(String(accountId))}`,
     ),
 
   // autenticación (token) --------------------------------------------------
@@ -404,7 +798,13 @@ export const api = {
     register: (
       username: string,
       password: string,
-      opts: { email?: string; house?: string; vassalCode?: string } = {},
+      opts: {
+        email?: string;
+        house?: string;
+        vassalCode?: string;
+        startChoice?: "gobernador" | "vasallo" | "administrador";
+        sex?: "hombre" | "mujer";
+      } = {},
     ) =>
       request<{ token: string; username: string; house?: string; role?: string }>(
         "/api/auth/register/",
@@ -416,6 +816,8 @@ export const api = {
             email: opts.email ?? "",
             house: opts.house ?? "",
             vassal_code: opts.vassalCode ?? "",
+            start_choice: opts.startChoice ?? "",
+            sex: opts.sex ?? "",
           }),
         },
       ),

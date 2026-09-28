@@ -21,10 +21,13 @@ export default function Login({ onAuthed }: { onAuthed: () => void }) {
   const [email, setEmail] = useState("");
   const [house, setHouse] = useState("");
   const [vassalCode, setVassalCode] = useState("");
+  const [startChoice, setStartChoice] =
+    useState<"gobernador" | "administrador" | "vasallo">("administrador");
+  const [sex, setSex] = useState<"hombre" | "mujer">("hombre");
+  const [infoOpen, setInfoOpen] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [noLand, setNoLand] = useState(false);
   const [busy, setBusy] = useState(false);
 
   async function submit(e: React.FormEvent) {
@@ -38,6 +41,10 @@ export default function Login({ onAuthed }: { onAuthed: () => void }) {
       setError("Indica el nombre de tu dinastía (una sola palabra).");
       return;
     }
+    if (mode === "register" && startChoice === "vasallo" && !vassalCode.trim()) {
+      setError("Para iniciar como vasallo necesitas un código de vasallaje.");
+      return;
+    }
     setBusy(true);
     try {
       const res =
@@ -47,6 +54,8 @@ export default function Login({ onAuthed }: { onAuthed: () => void }) {
               email,
               house: house.trim(),
               vassalCode: vassalCode.trim() || undefined,
+              startChoice,
+              sex,
             });
       setToken(res.token);
       queryClient.clear(); // descartar cualquier estado de la sesión anterior
@@ -64,11 +73,10 @@ export default function Login({ onAuthed }: { onAuthed: () => void }) {
         err instanceof ApiError ? (err.payload as Record<string, unknown>) : null;
       const code = payload?.error as string | undefined;
       const msg = (payload?.msg as string) || null;
-      if (code === "sin_tierras") {
-        setNoLand(true);
+      if (code === "sin_tierras" || code === "sin_feudos") {
         setError(
           msg ||
-            "No quedan regiones libres. Pega un código de vasallaje para entrar como vasallo.",
+            "No quedó tierra disponible. Prueba iniciar como vasallo con un código, o reintenta.",
         );
       } else if (err instanceof ApiError) {
         setError(
@@ -156,16 +164,90 @@ export default function Login({ onAuthed }: { onAuthed: () => void }) {
           )}
 
           {mode === "register" && (
-            <label className="field">
-              <span>Código de vasallaje (opcional)</span>
-              <input
-                value={vassalCode}
-                onChange={(e) => setVassalCode(e.target.value.toUpperCase())}
-                placeholder={noLand ? "obligatorio: no quedan regiones libres" : "solo si te invitaron"}
-                autoCapitalize="characters"
-                spellCheck={false}
-              />
-            </label>
+            <div className="start-choice">
+              <div className="start-choice-title">¿Cómo empiezas?</div>
+              {([
+                {
+                  id: "gobernador" as const,
+                  label: "Señor de una región",
+                  info:
+                    "Recibes una región entera sin reclamar con sus provincias, población NPC " +
+                    "y tu feudo capital. Fundarla tendrá un peaje de 100 monedas (por ahora abierto gratis).",
+                },
+                {
+                  id: "administrador" as const,
+                  label: "Administrador de un feudo (gratis)",
+                  info:
+                    "Entras sin tierras propias: gestionas un feudo activo de otra casa " +
+                    "(sembrar, cosechar, pastoreo, compost, jornaleros). No eres su dueño: retienes " +
+                    "la cosecha menos el impuesto que fije el señor de la provincia.",
+                },
+                {
+                  id: "vasallo" as const,
+                  label: "Vasallo (con código de referido)",
+                  info:
+                    "Te integras a la provincia de otro señor con un código de vasallaje que él te haya dado.",
+                },
+              ]).map((opt) => (
+                <div className={"choice" + (startChoice === opt.id ? " selected" : "")} key={opt.id}>
+                  <label className="choice-main">
+                    <input
+                      type="radio"
+                      name="start_choice"
+                      checked={startChoice === opt.id}
+                      onChange={() => setStartChoice(opt.id)}
+                    />
+                    <span>{opt.label}</span>
+                  </label>
+                  <button
+                    type="button"
+                    className="choice-info"
+                    aria-label={`Qué significa ${opt.label}`}
+                    onClick={() => setInfoOpen(infoOpen === opt.id ? null : opt.id)}
+                  >
+                    ?
+                  </button>
+                  {infoOpen === opt.id && <p className="choice-detail">{opt.info}</p>}
+                </div>
+              ))}
+
+              {startChoice === "vasallo" && (
+                <label className="field">
+                  <span>Código de vasallaje</span>
+                  <input
+                    value={vassalCode}
+                    onChange={(e) => setVassalCode(e.target.value.toUpperCase())}
+                    placeholder="obligatorio: te lo dio el señor"
+                    autoCapitalize="characters"
+                    spellCheck={false}
+                  />
+                </label>
+              )}
+
+              <div className="field">
+                <span>Sexo del señor/a de la casa</span>
+                <div className="seg" role="radiogroup" aria-label="sexo del cabeza">
+                  <button
+                    type="button"
+                    className={"seg-btn" + (sex === "hombre" ? " selected" : "")}
+                    onClick={() => setSex("hombre")}
+                  >
+                    Hombre
+                  </button>
+                  <button
+                    type="button"
+                    className={"seg-btn" + (sex === "mujer" ? " selected" : "")}
+                    onClick={() => setSex("mujer")}
+                  >
+                    Mujer
+                  </button>
+                </div>
+                <p className="muted small" style={{ marginTop: 4 }}>
+                  Determina el sexo de tu personaje; su cónyuge será del sexo
+                  opuesto para que la línea familiar continúe.
+                </p>
+              </div>
+            </div>
           )}
 
           <label className="field">

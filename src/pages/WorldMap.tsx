@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, type MapRegionInfo, type MapState } from "@/api/client";
+import { api, type MapCampInfo, type MapRegionInfo, type MapState } from "@/api/client";
 import { QueryBoundary, GameIcon } from "@/components/ui";
 
 // ---------------------------------------------------------------------------
@@ -154,12 +154,17 @@ function MapBoard({
   const drag = useRef<{ x: number; y: number; tx: number; ty: number; moved: number } | null>(null);
 
   // Índices rápidos a partir del payload.
-  const { regionByKey, oasisSet, zoneByRow } = useMemo(() => {
+  const { regionByKey, oasisSet, zoneByRow, campsByKey } = useMemo(() => {
     const rk = new Map<string, MapRegionInfo>();
     for (const reg of d.regions) rk.set(`${reg.q},${reg.r}`, reg);
     const os = new Set<string>();
     for (const [gx, gy] of d.oasis) os.add(`${gx},${gy}`);
-    return { regionByKey: rk, oasisSet: os, zoneByRow: d.zones };
+    const ck = new Map<string, MapCampInfo[]>();
+    for (const camp of d.camps ?? []) {
+      const k = `${camp.q},${camp.r}`;
+      (ck.get(k) ?? ck.set(k, []).get(k)!).push(camp);
+    }
+    return { regionByKey: rk, oasisSet: os, zoneByRow: d.zones, campsByKey: ck };
   }, [d]);
 
   const W = d.width;
@@ -501,6 +506,34 @@ function MapBoard({
               </div>
             </>
           )}
+
+          {(campsByKey.get(`${selCell.q},${selCell.r}`) ?? []).map((camp) => (
+            <div className="card" key={camp.key} style={{ marginTop: 8 }}>
+              <h2>⚔ {camp.key}</h2>
+              <div className="row">
+                <span className="muted">Casa</span>
+                <span>{camp.house ?? "—"}</span>
+              </div>
+              <div className="row">
+                <span className="muted">Efectivos · poder</span>
+                <span>
+                  {camp.count} · {camp.power}
+                </span>
+              </div>
+              <div className="row">
+                <span className="muted">Moral media</span>
+                <span className={camp.moral != null && camp.moral < 3 ? "error" : "ok"}>
+                  {camp.moral ?? "—"}
+                </span>
+              </div>
+              <div className="row">
+                <span className="muted">Ropa (ciclo) · prisioneros</span>
+                <span>
+                  {camp.ropa_ciclo} · {camp.prisoners}
+                </span>
+              </div>
+            </div>
+          ))}
 
           {!selCell.isLand && (
             <p className="muted" style={{ margin: "8px 0 0" }}>

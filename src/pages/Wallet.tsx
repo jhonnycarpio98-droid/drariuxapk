@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, type WalletState } from "@/api/client";
+import { api, type WalletState, type FundQuote } from "@/api/client";
 import { QueryBoundary, money } from "@/components/ui";
 import { ensureWallet } from "@/lib/wallet";
+
+// Deep-link para comprar ATOM desde Binance (paso 1 del bridge IBC). Se abre en el
+// navegador/wallet del dispositivo; el envío real a la L1 lo hace la app al firmar.
+const BINANCE_ATOM_BUY = "https://www.binance.com/en/price/cosmos";
 
 export default function Wallet() {
   const qc = useQueryClient();
@@ -68,6 +72,8 @@ function WalletView({
 }) {
   const [addr, setAddr] = useState("");
   const [amount, setAmount] = useState("");
+  const [fundAtom, setFundAtom] = useState("");
+  const [quote, setQuote] = useState<FundQuote | null>(null);
 
   // Un único intento automático por montaje si el motor no tiene dirección;
   // si falla, el usuario puede reintentar con el botón.
@@ -80,6 +86,32 @@ function WalletView({
   }, [d.address, onEnsure]);
 
   const amt = Number(amount);
+  const atom = Number(fundAtom);
+
+  // Cotiza el fondeo (ATOM -> DRX al precio vivo) sin ejecutarlo.
+  async function doQuote() {
+    if (!Number.isFinite(atom) || atom <= 0) {
+      setQuote(null);
+      return;
+    }
+    const r = await api.walletAction({ action: "quote", atom_amount: atom });
+    if (r.ok && r.quote) setQuote(r.quote);
+    else setQuote(null);
+  }
+
+  // Cotiza al cambiar el importe (debounce ligero) y al montar si ya hay precio.
+  const quoteTimer = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    window.clearTimeout(quoteTimer.current);
+    quoteTimer.current = window.setTimeout(doQuote, 350);
+    return () => window.clearTimeout(quoteTimer.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fundAtom, d.price?.atom_usd]);
+
+  const price = d.price;
+  // En MOCK no hay cadena real: fondear/depositar sería acuñar drariux de la
+  // nada. El motor ya lo bloquea; aquí deshabilitamos esas acciones y avisamos.
+  const isLive = d.mode === "live";
   return (
     <div>
       <div className="card">
@@ -98,6 +130,15 @@ function WalletView({
         <div className="row">
           <span className="muted">Saldo on-chain</span>
           <span>{money(d.chain_balance, d.symbol)}</span>
+        </div>
+        <div className="row">
+          <span className="muted">Precio ATOM</span>
+          <span>
+            {price ? `${money(price.atom_usd, "USDT")} / ATOM` : "—"}
+            {price && (
+              <span className="muted"> · {price.rate_drx_per_usd} DRX/USDT</span>
+            )}
+          </span>
         </div>
         <div className="row">
           <span className="muted">Denominación</span>
@@ -135,7 +176,61 @@ function WalletView({
       </div>
 
       <div className="card">
-        <h2>Depósitos y reintegros</h2>
+        <h2>Fondear (cripto → {d.symbol})</h2>
+        <p className="muted" style={{ marginTop: 0 }}>
+          Compra/depósita ATOM, conértelo en {d.symbol} al precio vivo y se acredita en tu
+          wallet. Cada USDT de ATOM son{" "}
+          <b>{price ? price.rate_drx_per_usd : 1000}</b> {d.symbol}.
+        </p>
+        <div className="field">
+          <label htmlFor="atom">Importe (ATOM)</label>
+          <input
+            id="atom"
+            inputMode="decimal"
+            placeholder="0.0"
+            value={fundAtom}
+            onChange={(e) => setFundAtom(e.target.value)}
+          />
+        </div>
+        {quote && (
+          <div className="row">
+            <span className="muted">Recibirás</span>
+            <span className="ok">
+              +{money(quote.drx, d.symbol)}{" "}
+              <span className="muted">
+                (≈ {money(quote.usd_value, "USDT")} @ {money(quote.atom_usd, "USDT")})
+              </span>
+            </span>
+          </div>
+        )}
+        <div className="actions">
+          <a
+            className="btn ghost"
+            href={BINANCE_ATOM_BUY}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Comprar ATOM
+          </a>
+          <button
+            className="btn"
+            disabled={busy || !isLive || !Number.isFinite(atom) || atom <= 0}
+            onClick={() => onAction({ action: "fund_atom", atom_amount: atom })}
+          >
+            Fondear
+          </button>
+        </div>
+        {!isLive && (
+          <p className="muted" style={{ marginTop: 8 }}>
+            El fondeo con cripto está deshabilitado en modo de pruebas (sin cadena
+            real): los drariux se obtienen jugando. Se activará al conectar la red
+            drariux en producción.
+          </p>
+        )}
+      </div>
+
+      <div className="card">
+        <h2>Retirar / convertir y movim. internos</h2>
         <div className="field">
           <label htmlFor="amt">Importe ({d.symbol})</label>
           <input
@@ -149,17 +244,18 @@ function WalletView({
         <div className="actions">
           <button
             className="btn"
-            disabled={busy || !Number.isFinite(amt) || amt <= 0}
+            disabled={busy || !isLive || !Number.isFinite(amt) || amt <= 0}
             onClick={() => onAction({ action: "deposit", amount: amt })}
           >
-            Depositar
+            Depositar (cadena→juego)
           </button>
           <button
             className="btn ghost"
             disabled={busy || !Number.isFinite(amt) || amt <= 0}
-            onClick={() => onAction({ action: "withdraw", amount: amt })}
+            onClick={() => onAction({ action: "convert", amount: amt })}
+            title="Convierte saldo del juego a DRX on-chain (retiro vía DRXConverter)"
           >
-            Reintegrar
+            Retirar / convertir
           </button>
         </div>
 

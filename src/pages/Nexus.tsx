@@ -4,8 +4,10 @@ import {
   api,
   type NexusSummary,
   type NexusThreadView,
+  type NexusSearchResult,
 } from "@/api/client";
 import { QueryBoundary } from "@/components/ui";
+import { HouseLink } from "@/components/HouseProfile";
 
 // Nexus (Hito 5): mensajería directa entre casas + amistades.
 export default function Nexus() {
@@ -21,53 +23,139 @@ function InboxView({ onOpen }: { onOpen: (id: number) => void }) {
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["nexus"], queryFn: () => api.nexus() });
   const [ref, setRef] = useState("");
+  const [results, setResults] = useState<NexusSearchResult[] | null>(null);
 
+  const invalidate = () => qc.invalidateQueries({ queryKey: ["nexus"] });
+
+  // Solicitud de amistad bidireccional (enviar / aceptar / rechazar / cancelar /
+  // quitar). El nombre del jugador nunca se muestra: solo la CASA.
   const friends = useMutation({
-    mutationFn: (vars: { action: "add_friend" | "remove_friend"; friend: string }) =>
-      api.nexusAction(vars),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["nexus"] }),
+    mutationFn: (vars: {
+      action:
+        | "add_friend"
+        | "accept_friend"
+        | "reject_friend"
+        | "cancel_friend"
+        | "remove_friend";
+      friend: string;
+    }) => api.nexusAction(vars),
+    onSuccess: () => invalidate(),
   });
+
+  const search = useMutation({
+    mutationFn: (term: string) => api.nexusSearch(term),
+    onSuccess: (r) => setResults(r.results ?? []),
+  });
+
+  const act = (
+    action: "add_friend" | "accept_friend" | "reject_friend" | "cancel_friend" | "remove_friend",
+    friend: string,
+  ) => friends.mutate({ action, friend });
 
   return (
     <QueryBoundary q={q}>
       {(d: NexusSummary) => (
         <div>
           <div className="card">
-            <h2>Amigos</h2>
+            <h2>Buscar casa</h2>
             <div className="row">
               <input
                 className="input"
-                placeholder="casa o jugador…"
+                placeholder="nombre de la casa…"
                 value={ref}
                 onChange={(e) => setRef(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && ref.trim()) search.mutate(ref.trim());
+                }}
               />
               <button
                 className="btn"
-                disabled={!ref.trim() || friends.isPending}
-                onClick={() => {
-                  friends.mutate({ action: "add_friend", friend: ref.trim() });
-                  setRef("");
-                }}
+                disabled={!ref.trim() || search.isPending}
+                onClick={() => search.mutate(ref.trim())}
               >
-                Añadir
+                Buscar
               </button>
             </div>
-            {friends.isError && <p className="error">No se pudo agregar el amigo.</p>}
+            {results && results.length === 0 && (
+              <p className="muted">Sin coincidencias.</p>
+            )}
+            {results?.map((r) => (
+              <div className="row" key={r.account_id}>
+                <HouseLink accountId={r.account_id} label={r.house} />
+                <span className="row">
+                  {r.is_friend ? (
+                    <>
+                      <button className="btn" onClick={() => onOpen(r.account_id)}>
+                        Mensaje
+                      </button>
+                      <button
+                        className="btn ghost"
+                        onClick={() => act("remove_friend", String(r.account_id))}
+                      >
+                        Quitar
+                      </button>
+                    </>
+                  ) : r.requested_by_them ? (
+                    <>
+                      <button className="btn" onClick={() => act("accept_friend", String(r.account_id))}>
+                        Aceptar
+                      </button>
+                      <button className="btn ghost" onClick={() => act("reject_friend", String(r.account_id))}>
+                        Rechazar
+                      </button>
+                    </>
+                  ) : r.requested_by_you ? (
+                    <button className="btn ghost" onClick={() => act("cancel_friend", String(r.account_id))}>
+                      Solicitada · Cancelar
+                    </button>
+                  ) : (
+                    <button className="btn" onClick={() => act("add_friend", String(r.account_id))}>
+                      Solicitar amistad
+                    </button>
+                  )}
+                </span>
+              </div>
+            ))}
+            {friends.isError && <p className="error">No se pudo actualizar la amistad.</p>}
+          </div>
+
+          {(d.requests_in?.length ?? 0) > 0 && (
+            <div className="card">
+              <h2>Solicitudes recibidas</h2>
+              {d.requests_in.map((f) => (
+                <div className="row" key={f.account_id}>
+                  <HouseLink accountId={f.account_id} label={f.house} />
+                  <span className="row">
+                    <button className="btn" onClick={() => act("accept_friend", String(f.account_id))}>
+                      Aceptar
+                    </button>
+                    <button className="btn ghost" onClick={() => act("reject_friend", String(f.account_id))}>
+                      Rechazar
+                    </button>
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="card">
+            <h2>Amigos</h2>
             {d.friends.length === 0 ? (
-              <p className="muted">Sin amigos. Agrega una casa para poder mensajearla.</p>
+              <p className="muted">
+                Sin amigos. Busca una casa y envíale una solicitud; cuando la acepte
+                podréis mensajearos.
+              </p>
             ) : (
               d.friends.map((f) => (
                 <div className="row" key={f.account_id}>
-                  <span>
-                    <strong>{f.house}</strong> <span className="muted">({f.name})</span>
-                  </span>
+                  <HouseLink accountId={f.account_id} label={f.house} />
                   <span className="row">
                     <button className="btn" onClick={() => onOpen(f.account_id)}>
                       Mensaje
                     </button>
                     <button
                       className="btn ghost"
-                      onClick={() => friends.mutate({ action: "remove_friend", friend: String(f.account_id) })}
+                      onClick={() => act("remove_friend", String(f.account_id))}
                     >
                       Quitar
                     </button>
@@ -84,15 +172,11 @@ function InboxView({ onOpen }: { onOpen: (id: number) => void }) {
             ) : (
               d.threads.map((t) => (
                 <div className="row" key={t.account_id}>
-                  <button
-                    className="linklike"
-                    onClick={() => onOpen(t.account_id)}
-                    style={{ textAlign: "left" }}
-                  >
-                    <strong>{t.house}</strong>
+                  <div style={{ textAlign: "left" }}>
+                    <HouseLink accountId={t.account_id} label={t.house} />
                     {t.unread > 0 && <span className="pill horse"> {t.unread} nuevo</span>}
                     <div className="muted">{t.last}</div>
-                  </button>
+                  </div>
                   <button className="btn" onClick={() => onOpen(t.account_id)}>
                     Abrir
                   </button>
@@ -134,7 +218,10 @@ function ThreadView({ id, onBack }: { id: number; onBack: () => void }) {
             </button>
           </div>
           {!d.is_friend && (
-            <p className="error">No es tu amigo: agrégalo en Nexus para mensajearlo.</p>
+            <p className="error">
+              No sois amigos todavía: envíale una solicitud de amistad desde Nexus y,
+              cuando la acepte, podrás mensajearlo.
+            </p>
           )}
           <div className="thread">
             {d.messages.length === 0 ? (
